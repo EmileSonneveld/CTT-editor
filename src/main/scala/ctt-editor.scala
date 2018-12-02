@@ -10,14 +10,14 @@ import scala.scalajs.js.annotation.JSExportTopLevel
 import scala.util.control.Breaks._
 import scala.collection.mutable.Stack
 
-object TutorialApp {
+object CttEditor {
 
   val simple_ctt =
     """
-root_node
+trunk_node
 	child_1
 	child_2
-    """.stripMargin
+    """
   val ctt_code =
     """
 acces_schedule
@@ -48,8 +48,10 @@ acces_schedule
     //println(ctt_code)
     //appendPar(document.body, "Hello World. Emile2")
 
-    var simple = linear_parse_ctt(simple_ctt.replace("\r", ""))
-    println(simple)
+    var simple = linear_parse_ctt(ctt_code.replace("\r", ""))
+    val str = print_ctt(simple)
+    println(str)
+    //println(simple)
   }
 
   class CttNode {
@@ -63,9 +65,10 @@ acces_schedule
     val root = new CttNode
     root.name = "standard_root_node"
     val stack = new Stack[CttNode]
-    stack.push(root)
 
-    var indentLevel: Int = 0
+    var currentNode = root
+
+    var indentLevel: Int = -1
 
     var currentCharIndex: Int = 0
     var nextCharIndex = 0 // ignore first itteration.
@@ -73,22 +76,27 @@ acces_schedule
     while (nextCharIndex != -1) {
       val line = code.substring(currentCharIndex, nextCharIndex)
       if (!isEmpty(line)) {
-        var leading_tabs = count_leading_tabs(line)
+        println(line)
+        val leading_tabs = count_leading_tabs(line)
         var node = new CttNode
         node.name = line.substring(leading_tabs)
-        if (leading_tabs == indentLevel) {
-          stack.top.children += node
-        } else if (leading_tabs > indentLevel) {
-          if (leading_tabs > indentLevel + 1) throw new Exception("Too much indentation")
+        if (leading_tabs == indentLevel + 1) {
+          stack.push(currentNode)
           indentLevel = leading_tabs
-          stack.push(node)
-        } else { // De-indent
+        } else if (leading_tabs == indentLevel) {
+          // nothing special to do
+        } else if (leading_tabs < indentLevel) {
           shrink_stack(stack, leading_tabs + 1)
-          stack.push(node)
+        } else {
+          throw new Exception("Something went wrong")
         }
+
+        currentNode = node
+        stack.top.children += node
+
       }
-      currentCharIndex = nextCharIndex
-      nextCharIndex = code.indexOf("\n", currentCharIndex + 1)
+      currentCharIndex = nextCharIndex + 1
+      nextCharIndex = code.indexOf("\n", currentCharIndex + 1) // seek after newline
     }
 
     return root
@@ -101,42 +109,21 @@ acces_schedule
     }
   }
 
-/*
-  def parse_ctt(code: String): CttNode = {
-    var currentCharIndex: Int = 0
-    var indentLevel: Int = 0
+  def print_ctt(node:CttNode): String =
+  {
+    val sb = new StringBuilder
 
-    def parse_recusive(): CttNode = {
-      val root = new CttNode()
-
-      currentCharIndex = 0
-      var nextCharIndex = code.indexOf("\n", currentCharIndex)
-      while (nextCharIndex != -1) {
-        var line = code.substring(currentCharIndex, nextCharIndex)
-
-        if (!isEmpty(line)) {
-          var leading_tabs = count_leading_tabs(line)
-          if (leading_tabs == indentLevel) {
-            if (!isEmpty(root.name)) return root // we found a sibling
-            root.name = line.substring(leading_tabs)
-          } else if (leading_tabs < indentLevel) {
-            break
-          } else {
-            indentLevel += 1
-            var child = parse_recusive()
-            indentLevel -= 1
-            root.children += child
-          }
-        }
-
-        currentCharIndex = nextCharIndex
-        nextCharIndex = code.indexOf("\n", currentCharIndex)
+    def print_recurse(n:CttNode, indentLevel:Int = 0):Unit = {
+      sb.append(("\t" * indentLevel) + n.name+"\n")
+      for(child <- n.children){
+        print_recurse(child, indentLevel+1)
       }
-      return root
     }
 
-    return parse_recusive()
-  }*/
+    print_recurse(node)
+    val str = sb.toString()
+    return str
+  }
 
   def count_leading_tabs(str: String): Int = {
     var count = 0
