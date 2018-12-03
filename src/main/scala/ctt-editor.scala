@@ -44,6 +44,33 @@ acces_schedule
 	[>
 	quit
 """
+  val file_managing=
+    """
+file_managing
+	editing
+		open_file
+		[]>>
+		edit
+			insert
+			|[]|
+			cut
+			|[]|
+			scroll
+	[]
+	printing
+		select_print
+		>>
+		handle_printing
+			select_printer
+			[]>>
+			select_pages
+			[]>>
+			print
+	[]
+	deleting
+	[>
+	close
+"""
 
   def main(args: Array[String]): Unit = {
     val ctt = linear_parse_ctt(ctt_code.replace("\r", ""))
