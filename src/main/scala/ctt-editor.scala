@@ -1,23 +1,22 @@
-package tutorial.webapp
-
-//import java.util
+package main.scala
 
 import org.scalajs.dom
 import dom.document
-
+import org.scalajs.dom.raw.{SVGImageElement, SVGLineElement, SVGTextElement}
 import scala.collection.mutable.ListBuffer
 import scala.scalajs.js.annotation.JSExportTopLevel
 import scala.util.control.Breaks._
 import scala.collection.mutable.Stack
 
+
+class Vector2D(_x: Double, _y: Double) {
+  var x: Double = _x
+  var y: Double = _y
+}
+
+
 object CttEditor {
 
-  val simple_ctt =
-    """
-trunk_node
-	child_1
-	child_2
-    """
   val ctt_code =
     """
 acces_schedule
@@ -42,24 +41,140 @@ acces_schedule
 		[]>>
 		show_schedule
 	[>
-	quit"""
+	quit
+"""
 
   def main(args: Array[String]): Unit = {
-    //println(ctt_code)
-    //appendPar(document.body, "Hello World. Emile2")
-
-    var simple = linear_parse_ctt(ctt_code.replace("\r", ""))
-    val str = print_ctt(simple)
+    val ctt = linear_parse_ctt(ctt_code.replace("\r", ""))
+    val str = print_ctt(ctt)
     println(str)
-    //println(simple)
+    calculateWidth(ctt)
+    calculatePosition(ctt)
+    val el = render_ctt_to_svg(ctt)
+    dom.document.body.appendChild(el)
   }
+
+  val operators = List("|=|", "[]", "|||", "|[]|", "||", "[>", ">>", "[]>>", "|>")
 
   class CttNode {
     var name = "untitled_node"
-    var children= ListBuffer[CttNode]()
+    var children: ListBuffer[CttNode] = ListBuffer[CttNode]()
+    var pos = new Vector2D(-1, -1)
+    var width: Double = -1 // not calculated yet
+
+    def minimumWidth(): Double = {
+      Math.max(32, name.length * 6) // need to render in fixed width font
+    }
+
+    def GetIconName(): String = {
+      if (children.size > 0) return "abstraction.gif"
+      if(operators.contains(name)) return ""
+      return "interaction.gif"
+    }
   }
 
-  def isEmpty(x: String) = x == null || x.isEmpty
+  def calculateWidth(node: CttNode): Unit = {
+    val gap = 5
+    val padding: Double = 5.0
+
+    var acc_children: Double = 0.0
+    for (child <- node.children) {
+      calculateWidth(child)
+      acc_children += child.width
+    }
+    if (node.children.length > 1)
+      acc_children += gap * (node.children.length - 1)
+
+    node.width = Math.max(node.minimumWidth(), acc_children) + (padding * 2)
+  }
+
+  def vectorAdd(a: Vector2D, b: Vector2D): Vector2D = {
+    new Vector2D(a.x + b.x, a.y + b.y)
+  }
+
+  def calculatePosition(node: CttNode, offset: Vector2D = new Vector2D(0, 0)): Unit = {
+    val sizePerLayer = 60
+
+    node.pos.x = offset.x + node.width / 2
+    node.pos.y = offset.y
+
+    for (child <- node.children) {
+      calculatePosition(child, vectorAdd(offset, new Vector2D(0, sizePerLayer)))
+      offset.x += child.width
+    }
+  }
+
+  def render_ctt_to_svg(node: CttNode): org.scalajs.dom.raw.Element = {
+    val el = dom.document.createElementNS("http://www.w3.org/2000/svg", "svg")
+    el.setAttribute("width", "2000")
+    el.setAttribute("height", "2000")
+
+    def render_recurse(n: CttNode): Unit = {
+
+      var prevChild: CttNode = null
+      for (child <- n.children) {
+        if (prevChild != null) {
+          val line = document.createElementNS("http://www.w3.org/2000/svg", "line").asInstanceOf[SVGLineElement]
+          line.setAttribute("x1", "" + prevChild.pos.x)
+          line.setAttribute("y1", "" + prevChild.pos.y)
+          line.setAttribute("x2", "" + child.pos.x)
+          line.setAttribute("y2", "" + child.pos.y)
+          line.style.strokeWidth = "2"
+          line.style.stroke = "rgb(0,0,0)"
+          el.appendChild(line)
+        }
+        {
+          val line = document.createElementNS("http://www.w3.org/2000/svg", "line").asInstanceOf[SVGLineElement]
+          line.setAttribute("x1", "" + n.pos.x)
+          line.setAttribute("y1", "" + n.pos.y)
+          line.setAttribute("x2", "" + child.pos.x)
+          line.setAttribute("y2", "" + child.pos.y)
+          line.style.strokeWidth = "2"
+          line.style.stroke = "rgb(0,0,0)"
+          el.appendChild(line)
+        }
+        render_recurse(child)
+        prevChild = child
+      }
+
+
+      val icon = n.GetIconName()
+      if(icon == ""){
+
+        val rect = document.createElementNS("http://www.w3.org/2000/svg", "rect")
+        rect.setAttribute("x", "" + (n.pos.x - 16))
+        rect.setAttribute("y", "" + (n.pos.y - 16))
+        rect.setAttribute("width", "32")
+        rect.setAttribute("height", "32")
+        rect.setAttribute("fill", "#FFFFFF") // to hide lines passing behind it
+        el.appendChild(rect)
+      }else{
+
+        val img = document.createElementNS("http://www.w3.org/2000/svg", "image").asInstanceOf[SVGImageElement]
+        img.setAttribute("x", "" + (n.pos.x - 16))
+        img.setAttribute("y", "" + (n.pos.y - 16))
+        img.setAttribute("width", "32")
+        img.setAttribute("height", "32")
+        img.setAttributeNS("http://www.w3.org/1999/xlink","href", icon)
+        img.setAttributeNS(null, "visibility", "visible")
+        el.appendChild(img)
+      }
+
+      val text = document.createElementNS("http://www.w3.org/2000/svg", "text").asInstanceOf[SVGTextElement]
+      text.setAttribute("x", "" + (n.pos.x - n.name.length * 3))
+      text.setAttribute("y", "" + (n.pos.y + 16))
+      text.setAttribute("width", "999")
+      text.setAttribute("height", "32")
+      text.innerHTML = n.name
+      text.style.fontFamily = "monospace"
+      el.appendChild(text)
+    }
+
+    render_recurse(node)
+    return el
+  }
+
+  def isEmpty(x: String): Boolean = x == null || x.isEmpty
 
   def linear_parse_ctt(code: String): CttNode = {
     val root = new CttNode
@@ -102,21 +217,20 @@ acces_schedule
     return root
   }
 
-  def shrink_stack(stack:Stack[CttNode], size:Int) = {
-    assert(stack.size >=size)
-    for(i <- 0 until stack.size - size){
+  def shrink_stack(stack: Stack[CttNode], size: Int): Unit = {
+    assert(stack.size >= size)
+    for (_ <- 0 until stack.size - size) {
       stack.pop()
     }
   }
 
-  def print_ctt(node:CttNode): String =
-  {
+  def print_ctt(node: CttNode): String = {
     val sb = new StringBuilder
 
-    def print_recurse(n:CttNode, indentLevel:Int = 0):Unit = {
-      sb.append(("\t" * indentLevel) + n.name+"\n")
-      for(child <- n.children){
-        print_recurse(child, indentLevel+1)
+    def print_recurse(n: CttNode, indentLevel: Int = 0): Unit = {
+      sb.append(("\t" * indentLevel) + n.name + "\n")
+      for (child <- n.children) {
+        print_recurse(child, indentLevel + 1)
       }
     }
 
