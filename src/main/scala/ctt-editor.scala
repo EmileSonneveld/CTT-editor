@@ -2,7 +2,8 @@ package main.scala
 
 import org.scalajs.dom
 import dom.document
-import org.scalajs.dom.raw.{SVGImageElement, SVGLineElement, SVGTextElement}
+import org.scalajs.dom.raw.{SVGImageElement, SVGLineElement, SVGRectElement, SVGTextElement}
+
 import scala.collection.mutable.ListBuffer
 import scala.scalajs.js.annotation.JSExportTopLevel
 import scala.util.control.Breaks._
@@ -68,7 +69,7 @@ acces_schedule
 
     def GetIconName(): String = {
       if (children.size > 0) return "abstraction.gif"
-      if(operators.contains(name)) return ""
+      if (operators.contains(name)) return ""
       return "interaction.gif"
     }
   }
@@ -109,37 +110,53 @@ acces_schedule
     el.setAttribute("width", "2000")
     el.setAttribute("height", "2000")
 
-    def render_recurse(n: CttNode): Unit = {
+    def render_recurse_lines(n: CttNode): Unit = {
 
       var prevChild: CttNode = null
       for (child <- n.children) {
         if (prevChild != null) {
           val line = document.createElementNS("http://www.w3.org/2000/svg", "line").asInstanceOf[SVGLineElement]
-          line.setAttribute("x1", "" + prevChild.pos.x)
-          line.setAttribute("y1", "" + prevChild.pos.y)
-          line.setAttribute("x2", "" + child.pos.x)
+          line.setAttribute("x1", "" + (prevChild.pos.x + 16))
+          line.setAttribute("y1", "" + (prevChild.pos.y))
+          line.setAttribute("x2", "" + (child.pos.x - 16))
           line.setAttribute("y2", "" + child.pos.y)
           line.style.strokeWidth = "2"
-          line.style.stroke = "rgb(0,0,0)"
+          line.style.stroke = "rgb(100, 100, 100)"
           el.appendChild(line)
         }
         {
           val line = document.createElementNS("http://www.w3.org/2000/svg", "line").asInstanceOf[SVGLineElement]
           line.setAttribute("x1", "" + n.pos.x)
-          line.setAttribute("y1", "" + n.pos.y)
+          line.setAttribute("y1", "" + (n.pos.y + 16))
           line.setAttribute("x2", "" + child.pos.x)
-          line.setAttribute("y2", "" + child.pos.y)
+          line.setAttribute("y2", "" + (child.pos.y - 16))
           line.style.strokeWidth = "2"
-          line.style.stroke = "rgb(0,0,0)"
+          line.style.stroke = "rgba(100, 100, 100, 200)"
           el.appendChild(line)
         }
-        render_recurse(child)
+        render_recurse_lines(child)
         prevChild = child
       }
+    }
 
+    def render_recurse(n: CttNode): Unit = {
+      val text = document.createElementNS("http://www.w3.org/2000/svg", "text").asInstanceOf[SVGTextElement]
+      text.setAttribute("x", "" + (n.pos.x - n.name.length * 3))
+      text.setAttribute("width", "" + (n.name.length * 7.2))
+      text.setAttribute("height", "15")
+      text.innerHTML = n.name
+      text.style.fontFamily = "monospace"
+
+      val text_bg = document.createElementNS("http://www.w3.org/2000/svg", "rect").asInstanceOf[SVGRectElement]
+      text_bg.setAttribute("x", text.getAttribute("x"))
+      text_bg.setAttribute("width", text.getAttribute("width"))
+      text_bg.setAttribute("height", text.getAttribute("height"))
+      text_bg.style.fill = "rgba(255, 255, 255, 0.7)"
 
       val icon = n.GetIconName()
-      if(icon == ""){
+      if (icon == "") {
+        text.setAttribute("y", "" + (n.pos.y + 2))
+        text_bg.setAttribute("y", "" + (n.pos.y + 2 - 11))
 
         val rect = document.createElementNS("http://www.w3.org/2000/svg", "rect")
         rect.setAttribute("x", "" + (n.pos.x - 16))
@@ -148,28 +165,29 @@ acces_schedule
         rect.setAttribute("height", "32")
         rect.setAttribute("fill", "#FFFFFF") // to hide lines passing behind it
         el.appendChild(rect)
-      }else{
+      } else {
+        text.setAttribute("y", "" + (n.pos.y + 26))
+        text_bg.setAttribute("y", "" + (n.pos.y + 26 - 11))
 
         val img = document.createElementNS("http://www.w3.org/2000/svg", "image").asInstanceOf[SVGImageElement]
         img.setAttribute("x", "" + (n.pos.x - 16))
         img.setAttribute("y", "" + (n.pos.y - 16))
         img.setAttribute("width", "32")
         img.setAttribute("height", "32")
-        img.setAttributeNS("http://www.w3.org/1999/xlink","href", icon)
+        img.setAttributeNS("http://www.w3.org/1999/xlink", "href", icon)
         img.setAttributeNS(null, "visibility", "visible")
         el.appendChild(img)
       }
 
-      val text = document.createElementNS("http://www.w3.org/2000/svg", "text").asInstanceOf[SVGTextElement]
-      text.setAttribute("x", "" + (n.pos.x - n.name.length * 3))
-      text.setAttribute("y", "" + (n.pos.y + 16))
-      text.setAttribute("width", "999")
-      text.setAttribute("height", "32")
-      text.innerHTML = n.name
-      text.style.fontFamily = "monospace"
+      el.appendChild(text_bg)
       el.appendChild(text)
+
+      for (child <- n.children) {
+        render_recurse(child)
+      }
     }
 
+    render_recurse_lines(node)
     render_recurse(node)
     return el
   }
