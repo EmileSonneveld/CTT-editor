@@ -2,7 +2,7 @@ package main.scala
 
 import org.scalajs.dom
 import dom.{Event, XMLHttpRequest, document}
-import org.scalajs.dom.raw.{SVGImageElement, SVGLineElement, SVGRectElement, SVGTextElement}
+import org.scalajs.dom.raw._
 
 import scala.collection.mutable.ListBuffer
 import scala.scalajs.js.annotation.JSExportTopLevel
@@ -18,26 +18,56 @@ class Vector2D(_x: Double, _y: Double) {
 
 object CttEditor {
 
+  var cttArea: HTMLTextAreaElement = _
+  var cttHolder: Element = _
 
   def main(args: Array[String]): Unit = {
+    //if(dom.document == null) return
+
+    cttHolder = dom.document.body.querySelector("#ctt-holder")
+    cttArea = dom.document.body.querySelector("#ctt-texarea").asInstanceOf[HTMLTextAreaElement]
+    cttArea.addEventListener("change", cttChanged)
+    cttArea.addEventListener("keyup", cttChanged)
+
     val oReq = new XMLHttpRequest()
     oReq.addEventListener("load", reqListener)
-    oReq.open("GET", "acces_schedule.txt", async = false)
+    oReq.open("GET", "acces_schedule.txt") //, async = false)
     oReq.send()
+
   }
 
-  def reqListener(evt:Event): Unit =
-  {
-    val ctt_code = evt.target.asInstanceOf[XMLHttpRequest].responseText
+  def cttChanged(evt: Event): Unit = {
+    println("cttChanged")
 
-    val ctt = linear_parse_ctt(ctt_code.replace("\r", ""))
-    val str = print_ctt(ctt)
-    println(str)
-    calculateWidth(ctt)
-    calculatePosition(ctt)
-    val el = render_ctt_to_svg(ctt)
-    dom.document.body.appendChild(el)
-    println(evt)
+    var ctt_code = cttArea.value
+    var ctt: CttNode = null
+    try {
+      ctt_code = "\n" + ctt_code.trim + "\n"
+      ctt_code = ctt_code.replace("\r", "")
+      ctt = linear_parse_ctt(ctt_code)
+      val str = print_ctt(ctt)
+      //println(str)
+      calculateWidth(ctt)
+      calculatePosition(ctt)
+    }
+    catch {
+      case ex: Exception => println(ex)
+    }
+
+    //cttHolder = dom.document.body.querySelector("#ctt-holder")
+    while (cttHolder.firstChild != null) {
+      cttHolder.removeChild(cttHolder.firstChild);
+    }
+
+    val el = render_ctt_to_svg(ctt.children(0))
+    cttHolder.appendChild(el)
+  }
+
+  def reqListener(evt: Event): Unit = {
+    val ctt_code = evt.target.asInstanceOf[XMLHttpRequest].responseText
+    println("reqListener")
+    cttArea.value = ctt_code
+    cttChanged(null)
   }
 
   val operators = List("|=|", "[]", "|||", "|[]|", "||", "[>", ">>", "[]>>", "|>")
@@ -55,8 +85,12 @@ object CttEditor {
     def GetIconName(): String = {
       if (children.size > 0) return "abstraction.gif"
       if (operators.contains(name)) return ""
+      if (name.startsWith("show")
+        || name.startsWith("check")
+        || name.startsWith("is")) return "application.gif"
       return "interaction.gif"
     }
+
     override def toString = {
       name
     }
@@ -95,8 +129,8 @@ object CttEditor {
 
   def render_ctt_to_svg(node: CttNode): org.scalajs.dom.raw.Element = {
     val el = dom.document.createElementNS("http://www.w3.org/2000/svg", "svg")
-    el.setAttribute("width", "2000")
-    el.setAttribute("height", "2000")
+    el.setAttribute("width", "1600")
+    el.setAttribute("height", "1000")
 
     def render_recurse_lines(n: CttNode): Unit = {
 
@@ -112,6 +146,8 @@ object CttEditor {
           line.style.stroke = "rgb(100, 100, 100)"
           el.appendChild(line)
         }
+        val icon = child.GetIconName()
+        if(!isEmpty(icon))
         {
           val line = document.createElementNS("http://www.w3.org/2000/svg", "line").asInstanceOf[SVGLineElement]
           line.setAttribute("x1", "" + n.pos.x)
@@ -203,7 +239,6 @@ object CttEditor {
         node.name = line.substring(leading_tabs)
         if (leading_tabs == indentLevel + 1) {
           stack.push(currentNode)
-          indentLevel = leading_tabs
         } else if (leading_tabs == indentLevel) {
           // nothing special to do
         } else if (leading_tabs < indentLevel) {
@@ -212,6 +247,7 @@ object CttEditor {
           throw new Exception("Something went wrong")
         }
 
+        indentLevel = leading_tabs
         currentNode = node
         stack.top.children += node
 
