@@ -1,7 +1,7 @@
 package main.scala
 
 import org.scalajs.dom
-import dom.document
+import dom.{Event, XMLHttpRequest, document}
 import org.scalajs.dom.raw.{SVGImageElement, SVGLineElement, SVGRectElement, SVGTextElement}
 
 import scala.collection.mutable.ListBuffer
@@ -18,61 +18,18 @@ class Vector2D(_x: Double, _y: Double) {
 
 object CttEditor {
 
-  val ctt_code =
-    """
-acces_schedule
-	view_schedule
-		select_doctor_task
-			browse_department
-				show_department
-				[]>>
-				select_sub_department
-			[>
-			submit_department
-			[]>>
-			select_doctor_in_department
-				filter_doctors
-					enter_word
-					|[]|
-					show_doctors_containing_word
-				[>
-				select_doctor
-		[]>>
-		use_this_doctor
-		[]>>
-		show_schedule
-	[>
-	quit
-"""
-  val file_managing=
-    """
-file_managing
-	editing
-		open_file
-		[]>>
-		edit
-			insert
-			|[]|
-			cut
-			|[]|
-			scroll
-	[]
-	printing
-		select_print
-		>>
-		handle_printing
-			select_printer
-			[]>>
-			select_pages
-			[]>>
-			print
-	[]
-	deleting
-	[>
-	close
-"""
 
   def main(args: Array[String]): Unit = {
+    val oReq = new XMLHttpRequest()
+    oReq.addEventListener("load", reqListener)
+    oReq.open("GET", "acces_schedule.txt", async = false)
+    oReq.send()
+  }
+
+  def reqListener(evt:Event): Unit =
+  {
+    val ctt_code = evt.target.asInstanceOf[XMLHttpRequest].responseText
+
     val ctt = linear_parse_ctt(ctt_code.replace("\r", ""))
     val str = print_ctt(ctt)
     println(str)
@@ -80,6 +37,7 @@ file_managing
     calculatePosition(ctt)
     val el = render_ctt_to_svg(ctt)
     dom.document.body.appendChild(el)
+    println(evt)
   }
 
   val operators = List("|=|", "[]", "|||", "|[]|", "||", "[>", ">>", "[]>>", "|>")
@@ -98,6 +56,9 @@ file_managing
       if (children.size > 0) return "abstraction.gif"
       if (operators.contains(name)) return ""
       return "interaction.gif"
+    }
+    override def toString = {
+      name
     }
   }
 
@@ -263,7 +224,8 @@ file_managing
   }
 
   def shrink_stack(stack: Stack[CttNode], size: Int): Unit = {
-    assert(stack.size >= size)
+    var stackSize = stack.size
+    assert(stackSize >= size)
     for (_ <- 0 until stack.size - size) {
       stack.pop()
     }

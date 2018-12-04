@@ -4,6 +4,7 @@ import main.scala.CttEditor
 import main.scala.CttEditor.CttNode
 
 import scala.collection.mutable
+import scala.io.Source
 
 class CttEditorTest extends FunSuite {
   test("CttEditor.count_leading_tabs") {
@@ -12,6 +13,7 @@ class CttEditorTest extends FunSuite {
     assert(CttEditor.count_leading_tabs("\t\tlol") === 2)
     assert(CttEditor.count_leading_tabs("\t\tlol\t\t\t\t") === 2)
   }
+
   test("CttEditor.shrink_stack") {
     val stack = new mutable.Stack[CttNode]()
     assert(stack.size === 0)
@@ -23,6 +25,16 @@ class CttEditorTest extends FunSuite {
     assert(stack.size === 4)
     CttEditor.shrink_stack(stack, 2)
     assert(stack.size === 2)
-
   }
+
+  test("CttEditor.linear_parse_ctt") {
+    val fileContents = Source.fromFile("www/acces_schedule.txt").getLines.mkString("\n")
+    val ctt = CttEditor.linear_parse_ctt(fileContents)
+    CttEditor.calculateWidth(ctt)
+    CttEditor.calculatePosition(ctt)
+
+    val serialise = CttEditor.print_ctt(ctt.children(0))
+    assert(fileContents.trim === serialise.trim)
+  }
+
 }
