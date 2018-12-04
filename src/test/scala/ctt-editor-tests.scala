@@ -28,13 +28,13 @@ class CttEditorTest extends FunSuite {
   }
 
   test("CttEditor.linear_parse_ctt") {
-    val fileContents = Source.fromFile("www/acces_schedule.txt").getLines.mkString("\n")
+    val fileContents = Source.fromFile("www/example.txt").getLines.mkString("\n")
     val ctt = CttEditor.linear_parse_ctt(fileContents)
     CttEditor.calculateWidth(ctt)
     CttEditor.calculatePosition(ctt)
 
     val serialise = CttEditor.print_ctt(ctt.children(0))
-    //assert(fileContents.trim === serialise.trim)
+    assert(fileContents.trim === serialise.trim)
   }
 
 

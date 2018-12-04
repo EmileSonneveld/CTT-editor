@@ -1,5 +1,4 @@
-
-acces_schedule
+example
 	view_schedule
 		select_doctor_task
 			browse_department

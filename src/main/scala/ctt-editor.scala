@@ -31,9 +31,8 @@ object CttEditor {
 
     val oReq = new XMLHttpRequest()
     oReq.addEventListener("load", reqListener)
-    oReq.open("GET", "acces_schedule.txt") //, async = false)
+    oReq.open("GET", "example.txt") //, async = false)
     oReq.send()
-
   }
 
   def cttChanged(evt: Event): Unit = {
@@ -42,8 +41,6 @@ object CttEditor {
     var ctt_code = cttArea.value
     var ctt: CttNode = null
     try {
-      ctt_code = "\n" + ctt_code.trim + "\n"
-      ctt_code = ctt_code.replace("\r", "")
       ctt = linear_parse_ctt(ctt_code)
       val str = print_ctt(ctt)
       //println(str)
@@ -129,7 +126,7 @@ object CttEditor {
 
   def render_ctt_to_svg(node: CttNode): org.scalajs.dom.raw.Element = {
     val el = dom.document.createElementNS("http://www.w3.org/2000/svg", "svg")
-    el.setAttribute("width", "1600")
+    el.setAttribute("width", "" + (node.width + 32))
     el.setAttribute("height", "1000")
 
     def render_recurse_lines(n: CttNode): Unit = {
@@ -219,6 +216,11 @@ object CttEditor {
   def isEmpty(x: String): Boolean = x == null || x.isEmpty
 
   def linear_parse_ctt(code: String): CttNode = {
+
+    var ctt_code = "\n" + code.trim + "\n"
+    ctt_code = ctt_code.replace("\r", "")
+
+
     val root = new CttNode
     root.name = "standard_root_node"
     val stack = new Stack[CttNode]
@@ -231,7 +233,7 @@ object CttEditor {
     var nextCharIndex = 0 // ignore first itteration.
 
     while (nextCharIndex != -1) {
-      val line = code.substring(currentCharIndex, nextCharIndex)
+      val line = ctt_code.substring(currentCharIndex, nextCharIndex)
       if (!isEmpty(line)) {
         println(line)
         val leading_tabs = count_leading_tabs(line)
@@ -253,7 +255,7 @@ object CttEditor {
 
       }
       currentCharIndex = nextCharIndex + 1
-      nextCharIndex = code.indexOf("\n", currentCharIndex + 1) // seek after newline
+      nextCharIndex = ctt_code.indexOf("\n", currentCharIndex + 1) // seek after newline
     }
 
     return root
