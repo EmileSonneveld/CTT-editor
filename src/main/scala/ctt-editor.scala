@@ -1,3 +1,4 @@
+package main.scala
 
 import org.scalajs.dom
 import dom.{Event, XMLHttpRequest, document}
@@ -38,27 +39,16 @@ object CttEditor {
   def cttChanged(evt: Event): Unit = {
     println("cttChanged")
 
-    var ctt_code = cttArea.value
-    var ctt: CttNode = null
-    try {
-      ctt = linear_parse_ctt(ctt_code)
-      val str = print_ctt(ctt)
-      //println(str)
-      calculateWidth(ctt)
-      calculatePosition(ctt)
-    }
-    catch {
-      case ex: Exception => println(ex)
-    }
+    val ctt_code = cttArea.value
+    cttHolder.innerHTML = ctt_code_to_svg(ctt_code)
+  }
 
-    //cttHolder = dom.document.body.querySelector("#ctt-holder")
-    /*while (cttHolder.firstChild != null) {
-      cttHolder.removeChild(cttHolder.firstChild);
-    }*/
-    val el = render_ctt_to_svg(ctt.children(0))
-    cttHolder.innerHTML = el
-
-      //cttHolder.appendChild(el)
+  def ctt_code_to_svg(cttCode: String): String = {
+    val ctt = linear_parse_ctt(cttCode)
+    calculateWidth(ctt)
+    calculatePosition(ctt)
+    val svg = render_ctt_to_svg(ctt.children(0))
+    return svg
   }
 
   def reqListener(evt: Event): Unit = {
@@ -127,19 +117,19 @@ object CttEditor {
 
   def render_ctt_to_svg(node: CttNode): String = {
     val sb = new StringBuilder
-    sb.append("""<?xml version="1.0" encoding="UTF-8" ?>""")
-    sb.append("""<svg width="""" + (node.width + 32) +"""" height="1000" xmlns="http://www.w3.org/2000/svg" version="1.1">""")
+    sb.append("<?xml version='1.0' encoding='UTF-8' ?>\n")
+    sb.append("<svg width='" + (node.width + 32) + "' height='1000' xmlns='http://www.w3.org/2000/svg' version='1.1'>\n")
 
     def render_recurse_lines(n: CttNode): Unit = {
 
       var prevChild: CttNode = null
       for (child <- n.children) {
         if (prevChild != null) {
-          sb.append("<line x1='" + (prevChild.pos.x + 16) + "' y1='" + prevChild.pos.y + "' x2='" + (child.pos.x - 16) + "' y2='" + child.pos.y + "' style='stroke-width: 2; stroke: rgb(100, 100, 100);'></line>")
+          sb.append("<line x1='" + (prevChild.pos.x + 16) + "' y1='" + prevChild.pos.y + "' x2='" + (child.pos.x - 16) + "' y2='" + child.pos.y + "' style='stroke-width: 2; stroke: rgb(100, 100, 100);'></line>\n")
         }
         val icon = child.GetIconName()
         if (!isEmpty(icon)) {
-          sb.append("<line x1='" + (n.pos.x) + "' y1='" + (n.pos.y + 16) + "' x2='" + child.pos.x + "' y2='" + (child.pos.y - 16) + "' style='stroke-width: 2; stroke: rgba(100, 100, 100, 200);'></line>")
+          sb.append("<line x1='" + (n.pos.x) + "' y1='" + (n.pos.y + 16) + "' x2='" + child.pos.x + "' y2='" + (child.pos.y - 16) + "' style='stroke-width: 2; stroke: rgba(100, 100, 100, 200);'></line>\n")
         }
         render_recurse_lines(child)
         prevChild = child
@@ -153,17 +143,17 @@ object CttEditor {
       if (icon == "") {
         text_y = (n.pos.y + 2)
         bg_y = (n.pos.y + 2 - 11)
-        sb.append("<rect x='" + (n.pos.x - 16) + " y='" + (n.pos.y - 16) + "'' width='32' height='32' style='fill: #FFFFFF;'></rect>")
+        sb.append("<rect x='" + (n.pos.x - 16) + "' y='" + (n.pos.y - 16) + "' width='32' height='32' style='fill: #FFFFFF;'></rect>\n")
 
       } else {
         text_y = (n.pos.y + 26)
         bg_y = (n.pos.y + 26 - 11)
-        sb.append("<image x='" + (n.pos.x - 16) + "' y='" + (n.pos.y - 16) + "' width='32' height='32' href='" + icon + "' visibility='visible'></image>")
+        sb.append("<image x='" + (n.pos.x - 16) + "' y='" + (n.pos.y - 16) + "' width='32' height='32' href='" + icon + "' visibility='visible'></image>\n")
       }
 
       val w = (n.name.length * 7.2)
-      sb.append("<rect x='" + (n.pos.x - n.name.length * 3) + " y='" + bg_y + "'' width='" + w + "' height='15' style='fill: rgba(255, 255, 255, 0.7);'></rect>")
-      sb.append("<text x='" + (n.pos.x - n.name.length * 3) + "' y='" + text_y + "' width='" + w + "' height='15' style='font-family: monospace;'>select_doctor_tas</text>")
+      sb.append("<rect x='" + (n.pos.x - n.name.length * 3) + "' y='" + bg_y + "' width='" + w + "' height='15' style='fill: rgba(255, 255, 255, 0.7);'></rect>\n")
+      sb.append("<text x='" + (n.pos.x - n.name.length * 3) + "' y='" + text_y + "' width='" + w + "' height='15' style='font-family: monospace;'>" + n.name + "</text>\n")
 
 
       for (child <- n.children) {
@@ -173,6 +163,7 @@ object CttEditor {
 
     render_recurse_lines(node)
     render_recurse(node)
+    sb.append("</svg>\n")
     return sb.toString()
   }
 
@@ -198,7 +189,6 @@ object CttEditor {
     while (nextCharIndex != -1) {
       val line = ctt_code.substring(currentCharIndex, nextCharIndex)
       if (!isEmpty(line)) {
-        println(line)
         val leading_tabs = count_leading_tabs(line)
         var node = new CttNode
         node.name = line.substring(leading_tabs)

@@ -1,3 +1,5 @@
+package main.scala
+
 import javafx.beans.{InvalidationListener, Observable}
 import javafx.collections.ObservableList
 import javafx.scene.control.SelectionMode
@@ -13,20 +15,18 @@ import scalafx.scene.paint.Color._
 import scalafx.scene.paint.Stops
 import scalafx.scene.text.Text
 import scalafx.scene.web.WebView
-
 import scala.io.Source
 
 object ScalafxGui extends JFXApp {
 
   private val wv = new WebView {}
-  private val fileContents = Source.fromFile("www/example.svg").getLines.mkString("\n")
-  wv.engine.loadContent(fileContents, "image/svg+xml")
   wv.maxWidth = 99999
 
   private val project = new CttProject
   //project.OpenProjectFromFolder("C:\\Users\\emill\\Dropbox\\slimmerWorden\\2018-2019-Semester1\\CMDM\\PROJECT\\ctt-editor-files")
   project.OpenProjectFromFolder("C:\\Users\\emill\\Dropbox (Persoonlijk)\\slimmerWorden\\2018-2019-Semester1\\CMDM\\PROJECT\\ctt-editor-files")
   private val f = project.getCttFiles()
+  wv.engine.load("www/example.svg")
 
   val textView = new TextArea()
   textView.vgrow = Priority.Always
@@ -34,8 +34,12 @@ object ScalafxGui extends JFXApp {
     override def invalidated(observable: Observable): Unit = onTextChanged()
   })
   def onTextChanged():Unit = {
-    // TODO: Should only save when parsing was succesfull or when user explicitly asks
-    //project.saveCttCode(listView.selectionModel.value.getSelectedItem, textView.textProperty.getValue)
+  val ctt_code=textView.textProperty.getValue
+    val svg = CttEditor.ctt_code_to_svg(ctt_code)
+    svgShow.text = svg
+    wv.engine.loadContent(svg, "image/svg+xml")
+
+    project.saveCttCode(listView.selectionModel.value.getSelectedItem, textView.textProperty.getValue)
   }
 
   private val listView = new ListView[String]()
@@ -53,8 +57,11 @@ object ScalafxGui extends JFXApp {
     override def invalidated(observable: Observable): Unit = selectedFileChanged()
   })
 
+
+  private val svgShow = new Text()
+
   stage = new PrimaryStage {
-    title = "ScalaFX Hello World"
+    title = "CTT-editor"
     scene = new Scene {
       fill = White
       minWidth = 600
@@ -70,7 +77,8 @@ object ScalafxGui extends JFXApp {
           new HBox {
             children = Seq(
               listView,
-              textView
+              textView,
+              //svgShow,
             )
           },
 

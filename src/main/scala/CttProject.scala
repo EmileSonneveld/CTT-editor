@@ -1,3 +1,5 @@
+package main.scala
+
 import java.io.{File, PrintWriter}
 import java.nio.file.Paths
 
