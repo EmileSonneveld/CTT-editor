@@ -22,6 +22,7 @@ object CttEditor {
   var cttHolder: Element = _
 
   def main(args: Array[String]): Unit = {
+    println(args.mkString(", "))
     //if(dom.document == null) return
 
     cttHolder = dom.document.body.querySelector("#ctt-holder")
