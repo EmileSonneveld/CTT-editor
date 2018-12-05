@@ -3,9 +3,11 @@ package main.scala
 import javafx.beans.{InvalidationListener, Observable}
 import javafx.collections.ObservableList
 import javafx.scene.control.SelectionMode
+import javax.swing.JPanel
 import scalafx.application.JFXApp
 import scalafx.application.JFXApp.PrimaryStage
 import scalafx.collections.ObservableBuffer
+import scalafx.embed.swing.SwingNode
 import scalafx.geometry.Insets
 import scalafx.scene.Scene
 import scalafx.scene.control.{ListView, TextArea, TextField}
@@ -15,6 +17,7 @@ import scalafx.scene.paint.Color._
 import scalafx.scene.paint.Stops
 import scalafx.scene.text.Text
 import scalafx.scene.web.WebView
+
 import scala.io.Source
 
 object ScalafxGui extends JFXApp {
@@ -33,13 +36,31 @@ object ScalafxGui extends JFXApp {
   textView.textProperty.addListener(new InvalidationListener {
     override def invalidated(observable: Observable): Unit = onTextChanged()
   })
-  def onTextChanged():Unit = {
-  val ctt_code=textView.textProperty.getValue
-    val svg = CttEditor.ctt_code_to_svg(ctt_code)
-    svgShow.text = svg
-    wv.engine.loadContent(svg, "image/svg+xml")
 
-    project.saveCttCode(listView.selectionModel.value.getSelectedItem, textView.textProperty.getValue)
+  def wrapWithHtml(code:String):String = {
+      """
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+      """ + code +
+      """
+</body>
+</html>
+      """
+  }
+
+  def onTextChanged(): Unit = {
+    val ctt_code = textView.textProperty.getValue
+    var svg = CttEditor.ctt_code_to_svg(ctt_code)
+    svg = wrapWithHtml(svg)
+    var path = project.saveFile("out/" + listView.selectionModel.value.getSelectedItem + ".html", svg)
+    path  = "file:///" + path
+    wv.engine.load("file:///C:/Users/emill/Dropbox%20(Persoonlijk)/slimmerWorden/2018-2019-Semester1/CMDM/PROJECT/ctt-editor-files/out/acces_schedule.txt.html")
+    //wv.engine.loadContent(svg, "image/svg+xml")
+
+    project.saveFile(listView.selectionModel.value.getSelectedItem, textView.textProperty.getValue)
   }
 
   private val listView = new ListView[String]()
@@ -57,8 +78,16 @@ object ScalafxGui extends JFXApp {
     override def invalidated(observable: Observable): Unit = selectedFileChanged()
   })
 
+  {
 
-  private val svgShow = new Text()
+    CefApp cefApp_ = CefApp.getInstance();
+    CefClient client_ = cefApp_.createClient();
+    CefBrowser browser_ = client_.createBrowser("https://www.google.com", OS.isLinux(), false);
+    Component browerUI_ = browser_.getUIComponent(); JPanel panel = new JPanel(); panel.add(browerUI_);
+    SwingNode swingNode = new SwingNode(); swingNode.setContent(panel);
+
+
+  }
 
   stage = new PrimaryStage {
     title = "CTT-editor"

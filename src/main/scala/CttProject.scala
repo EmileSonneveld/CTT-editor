@@ -36,8 +36,10 @@ class CttProject {
   }
 
   // Will eat error if fails
-  def saveCttCode(cttFileName: String, cttCode:String) = {
-    val p = Paths.get(projectPath, cttFileName).toString
-    new PrintWriter(p) { try {write(cttCode)} finally {close} }
+  // Returns the path where the file is saved
+  def saveFile(fileName: String, fileContent:String):String = {
+    val p = Paths.get(projectPath, fileName).toString
+    new PrintWriter(p) { try {write(fileContent)} finally {close} }
+    return p
   }
 }
