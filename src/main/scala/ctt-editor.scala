@@ -144,8 +144,7 @@ object CttEditor {
           el.appendChild(line)
         }
         val icon = child.GetIconName()
-        if(!isEmpty(icon))
-        {
+        if (!isEmpty(icon)) {
           val line = document.createElementNS("http://www.w3.org/2000/svg", "line").asInstanceOf[SVGLineElement]
           line.setAttribute("x1", "" + n.pos.x)
           line.setAttribute("y1", "" + (n.pos.y + 16))

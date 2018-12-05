@@ -14,7 +14,7 @@ import scalafx.scene.web.WebView
 
 import scala.io.Source
 
-object ScalaFXHelloWorld extends JFXApp {
+object ScalafxGui extends JFXApp {
 
   private val wv = new WebView {}
   private val fileContents = Source.fromFile("www/example.svg").getLines.mkString("\n")

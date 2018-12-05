@@ -1,6 +1,5 @@
 import java.io.File
 
-import scala.collection.immutable
 
 class CttProject {
 
@@ -17,9 +16,8 @@ class CttProject {
 
   def OpenProjectFromFolder(path: String) = {
     projectPath = path
-
-
   }
+
 
   def getCttFiles(): List[String] = {
     var f = getListOfFiles(projectPath)
