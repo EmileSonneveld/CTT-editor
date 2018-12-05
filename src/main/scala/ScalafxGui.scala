@@ -1,10 +1,12 @@
+import javafx.beans.{InvalidationListener, Observable}
 import javafx.collections.ObservableList
+import javafx.scene.control.SelectionMode
 import scalafx.application.JFXApp
 import scalafx.application.JFXApp.PrimaryStage
 import scalafx.collections.ObservableBuffer
 import scalafx.geometry.Insets
 import scalafx.scene.Scene
-import scalafx.scene.control.ListView
+import scalafx.scene.control.{ListView, TextArea, TextField}
 import scalafx.scene.effect.DropShadow
 import scalafx.scene.layout._
 import scalafx.scene.paint.Color._
@@ -19,22 +21,37 @@ object ScalafxGui extends JFXApp {
   private val wv = new WebView {}
   private val fileContents = Source.fromFile("www/example.svg").getLines.mkString("\n")
   wv.engine.loadContent(fileContents, "image/svg+xml")
+  wv.maxWidth = 99999
 
   private val project = new CttProject
-  project.OpenProjectFromFolder("C:\\Users\\emill\\Dropbox\\slimmerWorden\\2018-2019-Semester1\\CMDM\\PROJECT\\ctt-editor-files")
-  var f = project.getCttFiles()
+  //project.OpenProjectFromFolder("C:\\Users\\emill\\Dropbox\\slimmerWorden\\2018-2019-Semester1\\CMDM\\PROJECT\\ctt-editor-files")
+  project.OpenProjectFromFolder("C:\\Users\\emill\\Dropbox (Persoonlijk)\\slimmerWorden\\2018-2019-Semester1\\CMDM\\PROJECT\\ctt-editor-files")
+  private val f = project.getCttFiles()
 
+  val textView = new TextArea()
+  textView.vgrow = Priority.Always
+  textView.textProperty.addListener(new InvalidationListener {
+    override def invalidated(observable: Observable): Unit = onTextChanged()
+  })
+  def onTextChanged():Unit = {
+    // TODO: Should only save when parsing was succesfull or when user explicitly asks
+    //project.saveCttCode(listView.selectionModel.value.getSelectedItem, textView.textProperty.getValue)
+  }
 
   private val listView = new ListView[String]()
   val bf = new ObservableBuffer[String]()
   f.copyToBuffer(bf)
   listView.items = bf
 
-  def selectedFileChanged = {
-    println("selectedFileChanged: " + listView.selectionModel.value)
+  def selectedFileChanged() = {
+    println("selectedFileChanged: " + listView.selectionModel.value.getSelectedItem)
+    textView.text = project.getCttCode(listView.selectionModel.value.getSelectedItem)
   }
 
-  listView.selectionModel.onChange(selectedFileChanged)
+  listView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE)
+  listView.getSelectionModel().selectedIndexProperty().addListener(new InvalidationListener {
+    override def invalidated(observable: Observable): Unit = selectedFileChanged()
+  })
 
   stage = new PrimaryStage {
     title = "ScalaFX Hello World"
@@ -53,15 +70,7 @@ object ScalafxGui extends JFXApp {
           new HBox {
             children = Seq(
               listView,
-              new Text {
-                text = "editor "
-                style = "-fx-font-size: 48pt"
-                style = "-fx-background-color: #AAAAAA"
-                hgrow = Priority.Always
-
-                hgrow = Priority.Always
-                fill = Gray
-              }
+              textView
             )
           },
 

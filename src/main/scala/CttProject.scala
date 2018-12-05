@@ -1,4 +1,7 @@
-import java.io.File
+import java.io.{File, PrintWriter}
+import java.nio.file.Paths
+
+import scala.io.Source
 
 
 class CttProject {
@@ -20,7 +23,19 @@ class CttProject {
 
 
   def getCttFiles(): List[String] = {
-    var f = getListOfFiles(projectPath)
+    val f = getListOfFiles(projectPath)
     return f.filter(x => x.getName.endsWith(".txt")).map(x => x.getName)
+  }
+
+  def getCttCode(cttFileName: String): String = {
+    val p = Paths.get(projectPath, cttFileName).toString
+    val fileContents = Source.fromFile(p).getLines.mkString("\n")
+    return fileContents
+  }
+
+  // Will eat error if fails
+  def saveCttCode(cttFileName: String, cttCode:String) = {
+    val p = Paths.get(projectPath, cttFileName).toString
+    new PrintWriter(p) { try {write(cttCode)} finally {close} }
   }
 }

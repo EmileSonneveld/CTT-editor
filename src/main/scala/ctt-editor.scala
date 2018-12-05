@@ -52,12 +52,13 @@ object CttEditor {
     }
 
     //cttHolder = dom.document.body.querySelector("#ctt-holder")
-    while (cttHolder.firstChild != null) {
+    /*while (cttHolder.firstChild != null) {
       cttHolder.removeChild(cttHolder.firstChild);
-    }
-
+    }*/
     val el = render_ctt_to_svg(ctt.children(0))
-    cttHolder.appendChild(el)
+    cttHolder.innerHTML = el
+
+      //cttHolder.appendChild(el)
   }
 
   def reqListener(evt: Event): Unit = {
@@ -124,35 +125,21 @@ object CttEditor {
     }
   }
 
-  def render_ctt_to_svg(node: CttNode): org.scalajs.dom.raw.Element = {
-    val el = dom.document.createElementNS("http://www.w3.org/2000/svg", "svg")
-    el.setAttribute("width", "" + (node.width + 32))
-    el.setAttribute("height", "1000")
+  def render_ctt_to_svg(node: CttNode): String = {
+    val sb = new StringBuilder
+    sb.append("""<?xml version="1.0" encoding="UTF-8" ?>""")
+    sb.append("""<svg width="""" + (node.width + 32) +"""" height="1000" xmlns="http://www.w3.org/2000/svg" version="1.1">""")
 
     def render_recurse_lines(n: CttNode): Unit = {
 
       var prevChild: CttNode = null
       for (child <- n.children) {
         if (prevChild != null) {
-          val line = document.createElementNS("http://www.w3.org/2000/svg", "line").asInstanceOf[SVGLineElement]
-          line.setAttribute("x1", "" + (prevChild.pos.x + 16))
-          line.setAttribute("y1", "" + (prevChild.pos.y))
-          line.setAttribute("x2", "" + (child.pos.x - 16))
-          line.setAttribute("y2", "" + child.pos.y)
-          line.style.strokeWidth = "2"
-          line.style.stroke = "rgb(100, 100, 100)"
-          el.appendChild(line)
+          sb.append("<line x1='" + (prevChild.pos.x + 16) + "' y1='" + prevChild.pos.y + "' x2='" + (child.pos.x - 16) + "' y2='" + child.pos.y + "' style='stroke-width: 2; stroke: rgb(100, 100, 100);'></line>")
         }
         val icon = child.GetIconName()
         if (!isEmpty(icon)) {
-          val line = document.createElementNS("http://www.w3.org/2000/svg", "line").asInstanceOf[SVGLineElement]
-          line.setAttribute("x1", "" + n.pos.x)
-          line.setAttribute("y1", "" + (n.pos.y + 16))
-          line.setAttribute("x2", "" + child.pos.x)
-          line.setAttribute("y2", "" + (child.pos.y - 16))
-          line.style.strokeWidth = "2"
-          line.style.stroke = "rgba(100, 100, 100, 200)"
-          el.appendChild(line)
+          sb.append("<line x1='" + (n.pos.x) + "' y1='" + (n.pos.y + 16) + "' x2='" + child.pos.x + "' y2='" + (child.pos.y - 16) + "' style='stroke-width: 2; stroke: rgba(100, 100, 100, 200);'></line>")
         }
         render_recurse_lines(child)
         prevChild = child
@@ -160,47 +147,24 @@ object CttEditor {
     }
 
     def render_recurse(n: CttNode): Unit = {
-      val text = document.createElementNS("http://www.w3.org/2000/svg", "text").asInstanceOf[SVGTextElement]
-      text.setAttribute("x", "" + (n.pos.x - n.name.length * 3))
-      text.setAttribute("width", "" + (n.name.length * 7.2))
-      text.setAttribute("height", "15")
-      text.innerHTML = n.name
-      text.style.fontFamily = "monospace"
-
-      val text_bg = document.createElementNS("http://www.w3.org/2000/svg", "rect").asInstanceOf[SVGRectElement]
-      text_bg.setAttribute("x", text.getAttribute("x"))
-      text_bg.setAttribute("width", text.getAttribute("width"))
-      text_bg.setAttribute("height", text.getAttribute("height"))
-      text_bg.style.fill = "rgba(255, 255, 255, 0.7)"
-
+      var text_y: Double = -1
+      var bg_y: Double = -1
       val icon = n.GetIconName()
       if (icon == "") {
-        text.setAttribute("y", "" + (n.pos.y + 2))
-        text_bg.setAttribute("y", "" + (n.pos.y + 2 - 11))
+        text_y = (n.pos.y + 2)
+        bg_y = (n.pos.y + 2 - 11)
+        sb.append("<rect x='" + (n.pos.x - 16) + " y='" + (n.pos.y - 16) + "'' width='32' height='32' style='fill: #FFFFFF;'></rect>")
 
-        val rect = document.createElementNS("http://www.w3.org/2000/svg", "rect")
-        rect.setAttribute("x", "" + (n.pos.x - 16))
-        rect.setAttribute("y", "" + (n.pos.y - 16))
-        rect.setAttribute("width", "32")
-        rect.setAttribute("height", "32")
-        rect.setAttribute("fill", "#FFFFFF") // to hide lines passing behind it
-        el.appendChild(rect)
       } else {
-        text.setAttribute("y", "" + (n.pos.y + 26))
-        text_bg.setAttribute("y", "" + (n.pos.y + 26 - 11))
-
-        val img = document.createElementNS("http://www.w3.org/2000/svg", "image").asInstanceOf[SVGImageElement]
-        img.setAttribute("x", "" + (n.pos.x - 16))
-        img.setAttribute("y", "" + (n.pos.y - 16))
-        img.setAttribute("width", "32")
-        img.setAttribute("height", "32")
-        img.setAttributeNS("http://www.w3.org/1999/xlink", "href", icon)
-        img.setAttributeNS(null, "visibility", "visible")
-        el.appendChild(img)
+        text_y = (n.pos.y + 26)
+        bg_y = (n.pos.y + 26 - 11)
+        sb.append("<image x='" + (n.pos.x - 16) + "' y='" + (n.pos.y - 16) + "' width='32' height='32' href='" + icon + "' visibility='visible'></image>")
       }
 
-      el.appendChild(text_bg)
-      el.appendChild(text)
+      val w = (n.name.length * 7.2)
+      sb.append("<rect x='" + (n.pos.x - n.name.length * 3) + " y='" + bg_y + "'' width='" + w + "' height='15' style='fill: rgba(255, 255, 255, 0.7);'></rect>")
+      sb.append("<text x='" + (n.pos.x - n.name.length * 3) + "' y='" + text_y + "' width='" + w + "' height='15' style='font-family: monospace;'>select_doctor_tas</text>")
+
 
       for (child <- n.children) {
         render_recurse(child)
@@ -209,7 +173,7 @@ object CttEditor {
 
     render_recurse_lines(node)
     render_recurse(node)
-    return el
+    return sb.toString()
   }
 
   def isEmpty(x: String): Boolean = x == null || x.isEmpty
