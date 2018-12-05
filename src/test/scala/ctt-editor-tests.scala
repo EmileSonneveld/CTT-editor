@@ -1,7 +1,6 @@
 
 import org.scalatest.FunSuite
-import main.scala.CttEditor
-import main.scala.CttEditor.CttNode
+import CttEditor.CttNode
 
 import scala.collection.mutable
 import scala.io.Source

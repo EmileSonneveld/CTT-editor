@@ -1,4 +1,3 @@
-package main.scala
 
 import org.scalajs.dom
 import dom.{Event, XMLHttpRequest, document}
