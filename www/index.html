@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<style type="text/css">
+select {
+    min-width: 200px;
+    min-height: 45px;
+    max-height: 100%
+    border-width: 3px;
+    border-color: rgba(50, 50, 50, 0.14);
+    margin: 10px 10px 10px 0px;
+}
+html, body {
+    height: 100%;
+    margin: 0;
+}
+	</style>
+</head>
+<body>
+<!--
+"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" --disable-web-security --allow-file-access-from-files
+-->
+<div style="display:flex; flex-direction:column; height: 100%;">
+
+	<div style="display:flex; flex-direction:row; height: 400px;">
+		<select id="ctt-files" size="9" style="">
+			<option value="example 1">example 1</option>
+			<option value="example 2">example 2</option>
+			<option value="example 3">example 3</option>
+		</select>
+		<textarea id="ctt-texarea" style="width: 100%; tab-size: 2; min-width: 200px; background: antiquewhite;"></textarea>
+	</div>
+	<div id="ctt-holder" style="height: 100%; overflow: scroll;">test</div>
+</div>
+
+<script src="../target/scala-2.12/scala-js-tutorial-fastopt.js"></script>
+
+<script type="text/javascript">
+var cttTexarea = document.getElementById("ctt-texarea")
+cttTexarea.focus();
+
+var textareas = document.getElementsByTagName('textarea');
+var count = textareas.length;
+for(var i=0;i<count;i++){
+    textareas[i].onkeydown = function(e){
+        if(e.keyCode==9 || e.which==9){
+            e.preventDefault();
+            var s = this.selectionStart;
+            this.value = this.value.substring(0,this.selectionStart) + "\t" + this.value.substring(this.selectionEnd);
+            this.selectionEnd = s+1; 
+        }
+    }
+}
+	</script>
+</body>
+</html>

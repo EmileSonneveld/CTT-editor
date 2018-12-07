@@ -6,10 +6,10 @@ import java.util.zip.GZIPOutputStream
 import com.sun.net.httpserver.{HttpExchange, HttpHandler, HttpServer}
 
 object CrudServer extends App {
-  var server = HttpServer.create(new InetSocketAddress(8000), 0);
-  server.createContext("/", new StaticHandler());
-  server.setExecutor(null); // creates a default executor
-  server.start();
+  var server = HttpServer.create(new InetSocketAddress(8000), 0)
+  server.createContext("/", new StaticHandler())
+  server.setExecutor(null) // creates a default executor
+  server.start()
 
 
   // Inspired from: https://github.com/ianopolous/simple-http-server/blob/master/src/http/StaticHandler.java
@@ -18,24 +18,25 @@ object CrudServer extends App {
     private class Asset(val data: Array[Byte]) {
     }
 
-    val pathToRoot = ""
-    val caching = false
-    val gzip = false
-
-
+    private val pathToRoot = ""
+    private val caching = false
+    private val gzip = false
     private val data = new util.HashMap[String, Asset]
 
     @throws[IOException]
     def handle(httpExchange: HttpExchange): Unit = {
       var path = httpExchange.getRequestURI.getPath
+      var res: Asset = null
+      var status: Int = 500 // If not changed, we throw an error
       try {
+        if (path.contains("..")) throw new Exception("Supspicious path")
         path = path.substring(1)
         path = path.replaceAll("//", "/")
-        if (path.length == 0) path = "index.html"
+        if (new File(pathToRoot + path + "index.html").exists) path += "index.html"
         val fromFile = new File(pathToRoot + path).exists
         val in = if (fromFile) new FileInputStream(pathToRoot + path)
         else ClassLoader.getSystemClassLoader.getResourceAsStream(pathToRoot + path)
-        val res = if (caching) data.get(path)
+        res = if (caching) data.get(path)
         else new Asset(readResource(in, gzip))
         if (gzip) httpExchange.getResponseHeaders.set("Content-Encoding", "gzip")
         if (path.endsWith(".js")) httpExchange.getResponseHeaders.set("Content-Type", "text/javascript")
@@ -43,21 +44,26 @@ object CrudServer extends App {
         else if (path.endsWith(".css")) httpExchange.getResponseHeaders.set("Content-Type", "text/css")
         else if (path.endsWith(".json")) httpExchange.getResponseHeaders.set("Content-Type", "application/json")
         else if (path.endsWith(".svg")) httpExchange.getResponseHeaders.set("Content-Type", "image/svg+xml")
-        if (httpExchange.getRequestMethod.equals("HEAD")) {
-          httpExchange.getResponseHeaders.set("Content-Length", "" + res.data.length)
-          httpExchange.sendResponseHeaders(200, -1)
-          return
-        }
-        httpExchange.sendResponseHeaders(200, res.data.length)
-        httpExchange.getResponseBody.write(res.data)
-        httpExchange.getResponseBody.close
+        status = 200
       } catch {
         case t: NullPointerException =>
           System.err.println("Error retrieving: " + path)
+          status = 500
+          res = new Asset("NullPointerException".getBytes())
         case t: Throwable =>
           System.err.println("Error retrieving: " + path)
           t.printStackTrace()
+          status = 500
+          res = new Asset(t.getMessage.getBytes())
       }
+      if (httpExchange.getRequestMethod.equals("HEAD")) {
+        httpExchange.getResponseHeaders.set("Content-Length", "" + res.data.length)
+        httpExchange.sendResponseHeaders(status, -1)
+        return
+      }
+      httpExchange.sendResponseHeaders(status, res.data.length)
+      httpExchange.getResponseBody.write(res.data)
+      httpExchange.getResponseBody.close()
     }
 
     @throws[IOException]
@@ -85,9 +91,9 @@ object CrudServer extends App {
         gout.write(tmp, 0, r)
         r = in.read(tmp)
       }
-      gout.flush
-      gout.close
-      in.close
+      gout.flush()
+      gout.close()
+      in.close()
       bout.toByteArray
     }
   }
