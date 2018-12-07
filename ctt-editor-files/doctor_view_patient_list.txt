@@ -1,0 +1,27 @@
+view_patient_list
+	acces_list*
+		show list
+		[]>>
+		filter
+			name
+				show list
+				|||
+				enter name
+			[]
+			time interval
+				show calendar
+				[]>>
+				select date
+				[]>>
+				show calendar
+				[]
+				select date
+			[]
+			calendar
+			[]
+			id
+				show list
+				|||
+				enter id
+	[>
+	quit

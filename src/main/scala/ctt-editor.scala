@@ -20,6 +20,10 @@ object CttEditor {
 
   var cttArea: HTMLTextAreaElement = _
   var cttHolder: Element = _
+  var cttFiles:HTMLSelectElement = _
+
+
+
 
   def main(args: Array[String]): Unit = {
     println(args.mkString(", "))
@@ -30,9 +34,17 @@ object CttEditor {
     cttArea.addEventListener("change", cttChanged)
     cttArea.addEventListener("keyup", cttChanged)
 
+    cttFiles = dom.document.body.querySelector("#ctt-files").asInstanceOf[HTMLSelectElement]
+    cttFiles.addEventListener("change",selectedFileChanged)
+    cttFiles.selectedIndex = 0 // doesn't trigger the on change
+    selectedFileChanged(null)
+  }
+
+
+  private def selectedFileChanged(evt:Event): Unit = {
     val oReq = new XMLHttpRequest()
     oReq.addEventListener("load", reqListener)
-    oReq.open("GET", "example.txt") //, async = false)
+    oReq.open("GET", "../ctt-editor-files/" + cttFiles.value) //, async = false)
     oReq.send()
   }
 

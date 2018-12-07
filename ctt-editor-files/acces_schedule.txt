@@ -1,0 +1,23 @@
+acces_schedule
+	view_schedule
+		select_doctor_task
+			browse_department
+				show_department
+				[]>>
+				select_sub_department
+			[>
+			submit_department
+			[]>>
+			select_doctor_in_department
+				filter_doctors
+					enter_word
+					|[]|
+					show_doctors_containing_word
+				[>
+				select_doctor
+		[]>>
+		use_this_doctor
+		[]>>
+		show_schedule
+	[>
+	quit

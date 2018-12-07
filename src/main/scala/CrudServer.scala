@@ -5,7 +5,8 @@ import java.util.zip.GZIPOutputStream
 
 import com.sun.net.httpserver.{HttpExchange, HttpHandler, HttpServer}
 
-object CrudServer extends App {
+object CrudServer extends App
+{
   var server = HttpServer.create(new InetSocketAddress(8000), 0)
   server.createContext("/", new StaticHandler())
   server.setExecutor(null) // creates a default executor

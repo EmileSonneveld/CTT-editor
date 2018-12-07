@@ -1,0 +1,34 @@
+
+cancel_appointment
+	do_cancel
+		find_appointment
+			find_in_calendar
+				view_calendar
+				>>
+				select_appointment
+			[]
+			find_in_chronological_list
+				show_chronological_list
+				>>
+				select_from_list
+		[]>>
+		check_date
+			date_in_7d
+				show_facturation_msg
+			[]
+			date_after_7D
+				show nothing
+		>>
+		ask_confirmation
+			confirm
+				show_confirmation_message
+			[]
+			cancel
+		>>
+		delete appointment
+		[>
+		quit
+	|||
+	exit
+
+	

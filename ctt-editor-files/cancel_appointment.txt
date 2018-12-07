@@ -1,0 +1,10 @@
+cancel_appointment
+	view_appointments
+	[>
+	select_appointment
+	are_you_sure?
+		yes
+		[]
+		no
+	[>
+	quit

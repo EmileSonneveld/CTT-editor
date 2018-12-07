@@ -20,6 +20,7 @@ import scalafx.scene.web.WebView
 
 import scala.io.Source
 
+/*
 object ScalafxGui extends JFXApp {
 
   private val wv = new WebView {}
@@ -124,3 +125,4 @@ object ScalafxGui extends JFXApp {
     }
   }
 }
+*/

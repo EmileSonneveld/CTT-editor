@@ -1,0 +1,24 @@
+file_managing
+	editing
+		open_file
+		[]>>
+		edit
+			insert
+			|[]|
+			cut
+			|[]|
+			scroll
+	[]
+	printing
+		select_print
+		>>
+		handle_printing
+			select_printer
+			[]>>
+			select_pages
+			[]>>
+			print
+	[]
+	deleting
+	[>
+	close
