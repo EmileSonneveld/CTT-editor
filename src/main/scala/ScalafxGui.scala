@@ -80,12 +80,12 @@ object ScalafxGui extends JFXApp {
 
   {
 
-    CefApp cefApp_ = CefApp.getInstance();
+    /*CefApp cefApp_ = CefApp.getInstance();
     CefClient client_ = cefApp_.createClient();
     CefBrowser browser_ = client_.createBrowser("https://www.google.com", OS.isLinux(), false);
     Component browerUI_ = browser_.getUIComponent(); JPanel panel = new JPanel(); panel.add(browerUI_);
     SwingNode swingNode = new SwingNode(); swingNode.setContent(panel);
-
+    */
 
   }
 
