@@ -9,7 +9,7 @@ import scala.scalajs.js.annotation.JSExportTopLevel
 import scala.util.control.Breaks._
 import scala.collection.mutable.Stack
 import scala.scalajs.js
-import scala.scalajs.js.{JSON, URIUtils}
+import scala.scalajs.js._
 import play.api.libs.json._
 
 class Vector2D(_x: Double, _y: Double) {
@@ -23,8 +23,6 @@ object CttEditor {
   var cttArea: HTMLTextAreaElement = _
   var cttHolder: Element = _
   var cttFiles:HTMLSelectElement = _
-
-
 
 
   def main(args: Array[String]): Unit = {
@@ -51,9 +49,7 @@ object CttEditor {
     val files = evt.target.asInstanceOf[XMLHttpRequest].responseText
     val json = Json.parse(files).as[List[JsValue]]
 
-    //println(json)
     val innerHtml = json.map(x => s"<option value='${x("name").asInstanceOf[JsString].value}'>${x("name").asInstanceOf[JsString].value}</option>").mkString("\n")
-    println(innerHtml)
     cttFiles.innerHTML = innerHtml
 
     cttFiles.selectedIndex = 0 // doesn't trigger the on change
@@ -62,13 +58,12 @@ object CttEditor {
 
   private def selectedFileChanged(evt:Event): Unit = {
     val oReq = new XMLHttpRequest()
-    oReq.addEventListener("load", reqListener)
+    oReq.addEventListener("load", gotNewFileContent)
     oReq.open("GET", "../ctt-editor-files/" + cttFiles.value) //, async = false)
     oReq.send()
   }
 
   def cttChanged(evt: Event): Unit = {
-    println("cttChanged")
 
     val ctt_code = cttArea.value
     cttHolder.innerHTML = ctt_code_to_svg(ctt_code)
@@ -77,7 +72,9 @@ object CttEditor {
     oReq.addEventListener("load", fileUploaded)
     oReq.open("POST", "../ctt-editor-files/" + cttFiles.value) //, async = false)
     oReq.setRequestHeader("file_content", URIUtils.encodeURI(ctt_code))
-    oReq.send() //"file_content="+ctt_code
+    oReq.send()
+
+    println("cttChanged and was valid")
   }
 
   def fileUploaded(evt:Event) = {
@@ -92,9 +89,9 @@ object CttEditor {
     return svg
   }
 
-  def reqListener(evt: Event): Unit = {
+  def gotNewFileContent(evt: Event): Unit = {
     val ctt_code = evt.target.asInstanceOf[XMLHttpRequest].responseText
-    println("reqListener")
+    println("gotNewFileContent")
     cttArea.value = ctt_code
     cttChanged(null)
   }

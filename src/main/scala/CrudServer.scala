@@ -5,7 +5,8 @@ import java.util.zip.GZIPOutputStream
 import java.io.ByteArrayOutputStream
 import java.net.URLDecoder
 import java.nio.file.Paths
-//import org.simpleframework.common.parse.Parser
+import java.net.URLDecoder
+
 
 import com.sun.net.httpserver.{HttpExchange, HttpHandler, HttpServer}
 
@@ -41,11 +42,6 @@ object CrudServer extends App {
           println(httpExchange.getRequestBody)
           println("file_content", httpExchange.getAttribute("file_content"))
 
-          import java.io.ByteArrayOutputStream
-          import java.net.URLDecoder
-          import java.util
-
-
           // determine encoding// determine encoding
 
           //val parms = getPostParms(httpExchange.getRequestBody)
@@ -53,15 +49,7 @@ object CrudServer extends App {
           val fileContent = URLDecoder.decode((httpExchange.getRequestHeaders().get("file_content")).get(0), "utf-8")
 
           val f = new File(pathToRoot + path)
-          //val p = new File(pathToRoot, path).getCanonicalPath
-          new PrintWriter(f) {
-            try {
-              write(fileContent)
-            } finally {
-              close
-            }
-          }
-          println("File written")
+          new PrintWriter(f) {try {write(fileContent)} finally {close}}
           res = new Asset("File written".getBytes())
           status = 200
 
@@ -180,7 +168,6 @@ object CrudServer extends App {
     private def processFile(path: String, f: File, gzip: Boolean): Unit = {
       if (!f.isDirectory) data.put(path + f.getName, new Asset(readResource(new FileInputStream(f), gzip)))
       if (f.isDirectory) {
-        import scala.collection.JavaConversions._
         for (sub <- f.listFiles) {
           processFile(path + f.getName + "/", sub, gzip)
         }
