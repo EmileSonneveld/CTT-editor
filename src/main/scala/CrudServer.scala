@@ -10,12 +10,13 @@ import java.net.URLDecoder
 
 import com.sun.net.httpserver.{HttpExchange, HttpHandler, HttpServer}
 
+
 object CrudServer extends App {
   var server = HttpServer.create(new InetSocketAddress(8000), 0)
   server.createContext("/", new StaticHandler())
   server.setExecutor(null) // creates a default executor
   server.start()
-
+  println("Server has started. Open his url in a browser: http://localhost:8000/www/")
 
   // Inspired from: https://github.com/ianopolous/simple-http-server/blob/master/src/http/StaticHandler.java
   class StaticHandler extends HttpHandler {
@@ -38,9 +39,8 @@ object CrudServer extends App {
       var res: Asset = null
       var status: Int = 500 // If not changed, we throw an error
       try {
+        println(httpExchange.getRequestMethod + " " + httpExchange.getRequestURI.getPath)
         if (httpExchange.getRequestMethod == "POST") {
-          println(httpExchange.getRequestBody)
-          println("file_content", httpExchange.getAttribute("file_content"))
 
           // determine encoding// determine encoding
 
