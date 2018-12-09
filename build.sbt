@@ -21,3 +21,6 @@ libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "0.9.6"
 libraryDependencies += "org.scalactic" %% "scalactic" % "3.0.5"
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5" % "test"
 libraryDependencies += "org.scalafx" %% "scalafx" % "8.0.144-R12"
+
+// https://mvnrepository.com/artifact/com.typesafe.play/play-json
+libraryDependencies += "com.typesafe.play" %%% "play-json" % "2.7.0-RC2"

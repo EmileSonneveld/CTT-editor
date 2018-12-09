@@ -5,8 +5,7 @@ import java.util.zip.GZIPOutputStream
 
 import com.sun.net.httpserver.{HttpExchange, HttpHandler, HttpServer}
 
-object CrudServer extends App
-{
+object CrudServer extends App {
   var server = HttpServer.create(new InetSocketAddress(8000), 0)
   server.createContext("/", new StaticHandler())
   server.setExecutor(null) // creates a default executor
@@ -34,17 +33,28 @@ object CrudServer extends App
         path = path.substring(1)
         path = path.replaceAll("//", "/")
         if (new File(pathToRoot + path + "index.html").exists) path += "index.html"
-        val fromFile = new File(pathToRoot + path).exists
-        val in = if (fromFile) new FileInputStream(pathToRoot + path)
-        else ClassLoader.getSystemClassLoader.getResourceAsStream(pathToRoot + path)
-        res = if (caching) data.get(path)
-        else new Asset(readResource(in, gzip))
-        if (gzip) httpExchange.getResponseHeaders.set("Content-Encoding", "gzip")
-        if (path.endsWith(".js")) httpExchange.getResponseHeaders.set("Content-Type", "text/javascript")
-        else if (path.endsWith(".html")) httpExchange.getResponseHeaders.set("Content-Type", "text/html")
-        else if (path.endsWith(".css")) httpExchange.getResponseHeaders.set("Content-Type", "text/css")
-        else if (path.endsWith(".json")) httpExchange.getResponseHeaders.set("Content-Type", "application/json")
-        else if (path.endsWith(".svg")) httpExchange.getResponseHeaders.set("Content-Type", "image/svg+xml")
+        if (path.endsWith("/")) {
+          httpExchange.getResponseHeaders.set("Content-Type", "application/json")
+          val sb = new StringBuilder
+          sb.append("[\n")
+          sb.append(getListOfFiles(pathToRoot + path)
+            .map(f => s"""{\n\t"name":"${f.getName}"\n}""")
+            .mkString(",\n"))
+          sb.append("]\n")
+          res = new Asset(sb.toString().getBytes)
+        } else {
+          val fromFile = new File(pathToRoot + path).exists
+          val in = if (fromFile) new FileInputStream(pathToRoot + path)
+          else ClassLoader.getSystemClassLoader.getResourceAsStream(pathToRoot + path)
+          res = if (caching) data.get(path)
+          else new Asset(readResource(in, gzip))
+          if (gzip) httpExchange.getResponseHeaders.set("Content-Encoding", "gzip")
+          if (path.endsWith(".js")) httpExchange.getResponseHeaders.set("Content-Type", "text/javascript")
+          else if (path.endsWith(".html")) httpExchange.getResponseHeaders.set("Content-Type", "text/html")
+          else if (path.endsWith(".css")) httpExchange.getResponseHeaders.set("Content-Type", "text/css")
+          else if (path.endsWith(".json")) httpExchange.getResponseHeaders.set("Content-Type", "application/json")
+          else if (path.endsWith(".svg")) httpExchange.getResponseHeaders.set("Content-Type", "image/svg+xml")
+        }
         status = 200
       } catch {
         case t: NullPointerException =>
@@ -65,6 +75,15 @@ object CrudServer extends App
       httpExchange.sendResponseHeaders(status, res.data.length)
       httpExchange.getResponseBody.write(res.data)
       httpExchange.getResponseBody.close()
+    }
+
+    def getListOfFiles(dir: String): List[File] = {
+      val d = new File(dir)
+      if (d.exists && d.isDirectory) {
+        d.listFiles.filter(_.isFile).toList
+      } else {
+        List[File]()
+      }
     }
 
     @throws[IOException]
