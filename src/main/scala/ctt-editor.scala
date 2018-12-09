@@ -9,7 +9,7 @@ import scala.scalajs.js.annotation.JSExportTopLevel
 import scala.util.control.Breaks._
 import scala.collection.mutable.Stack
 import scala.scalajs.js
-import scala.scalajs.js.JSON
+import scala.scalajs.js.{JSON, URIUtils}
 import play.api.libs.json._
 
 class Vector2D(_x: Double, _y: Double) {
@@ -72,6 +72,16 @@ object CttEditor {
 
     val ctt_code = cttArea.value
     cttHolder.innerHTML = ctt_code_to_svg(ctt_code)
+
+    val oReq = new XMLHttpRequest()
+    oReq.addEventListener("load", fileUploaded)
+    oReq.open("POST", "../ctt-editor-files/" + cttFiles.value) //, async = false)
+    oReq.setRequestHeader("file_content", URIUtils.encodeURI(ctt_code))
+    oReq.send() //"file_content="+ctt_code
+  }
+
+  def fileUploaded(evt:Event) = {
+
   }
 
   def ctt_code_to_svg(cttCode: String): String = {
