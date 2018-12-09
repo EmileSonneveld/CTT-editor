@@ -9,7 +9,7 @@ import scala.scalajs.js.annotation.JSExportTopLevel
 import scala.util.control.Breaks._
 import scala.collection.mutable.Stack
 import scala.scalajs.js
-import scala.scalajs.js._
+import scala.scalajs.js.{JSON, URIUtils}
 import play.api.libs.json._
 
 class Vector2D(_x: Double, _y: Double) {
@@ -22,7 +22,7 @@ object CttEditor {
 
   var cttArea: HTMLTextAreaElement = _
   var cttHolder: Element = _
-  var cttFiles:HTMLSelectElement = _
+  var cttFiles: HTMLSelectElement = _
 
 
   def main(args: Array[String]): Unit = {
@@ -35,7 +35,7 @@ object CttEditor {
     cttArea.addEventListener("keyup", cttChanged)
 
     cttFiles = dom.document.body.querySelector("#ctt-files").asInstanceOf[HTMLSelectElement]
-    cttFiles.addEventListener("change",selectedFileChanged)
+    cttFiles.addEventListener("change", selectedFileChanged)
 
 
     val oReq = new XMLHttpRequest()
@@ -45,18 +45,23 @@ object CttEditor {
 
   }
 
-  private def gotFileNames(evt:Event): Unit = {
+  private def gotFileNames(evt: Event): Unit = {
     val files = evt.target.asInstanceOf[XMLHttpRequest].responseText
     val json = Json.parse(files).as[List[JsValue]]
 
-    val innerHtml = json.map(x => s"<option value='${x("name").asInstanceOf[JsString].value}'>${x("name").asInstanceOf[JsString].value}</option>").mkString("\n")
+    val innerHtml = json.map(x => {
+      var nameOrig = "" + x("name").asInstanceOf[JsString].value
+      var name = nameOrig
+      if (name.endsWith(".txt")) name = name.substring(0, name.length - ".txt".length)
+      s"<option value='${nameOrig}'>${name}</option>"
+    }).mkString("\n")
     cttFiles.innerHTML = innerHtml
 
     cttFiles.selectedIndex = 0 // doesn't trigger the on change
     selectedFileChanged(null)
   }
 
-  private def selectedFileChanged(evt:Event): Unit = {
+  private def selectedFileChanged(evt: Event): Unit = {
     val oReq = new XMLHttpRequest()
     oReq.addEventListener("load", gotNewFileContent)
     oReq.open("GET", "../ctt-editor-files/" + cttFiles.value) //, async = false)
@@ -77,7 +82,7 @@ object CttEditor {
     println("cttChanged and was valid")
   }
 
-  def fileUploaded(evt:Event) = {
+  def fileUploaded(evt: Event) = {
 
   }
 
@@ -163,11 +168,11 @@ object CttEditor {
       var prevChild: CttNode = null
       for (child <- n.children) {
         if (prevChild != null) {
-          sb.append("<line x1='" + (prevChild.pos.x + 16) + "' y1='" + prevChild.pos.y + "' x2='" + (child.pos.x - 16) + "' y2='" + child.pos.y + "' style='stroke-width: 2; stroke: rgb(100, 100, 100);'></line>\n")
+          sb.append("<line x1='" + (prevChild.pos.x + 17) + "' y1='" + (prevChild.pos.y + 0.5) + "' x2='" + (child.pos.x - 17) + "' y2='" + (prevChild.pos.y + 0.5) + "' style='stroke-width: 1; stroke: rgb(10, 10, 10);'></line>\n")
         }
         val icon = child.GetIconName()
         if (!isEmpty(icon)) {
-          sb.append("<line x1='" + (n.pos.x) + "' y1='" + (n.pos.y + 16) + "' x2='" + child.pos.x + "' y2='" + (child.pos.y - 16) + "' style='stroke-width: 2; stroke: rgba(100, 100, 100, 200);'></line>\n")
+          sb.append("<line x1='" + (n.pos.x) + "' y1='" + (n.pos.y + 16) + "' x2='" + child.pos.x + "' y2='" + (child.pos.y - 16) + "' style='stroke-width: 1; stroke: rgba(10, 10, 10, 200);'></line>\n")
         }
         render_recurse_lines(child)
         prevChild = child
@@ -179,8 +184,8 @@ object CttEditor {
       var bg_y: Double = -1
       val icon = n.GetIconName()
       if (icon == "") {
-        text_y = (n.pos.y + 2)
-        bg_y = (n.pos.y + 2 - 11)
+        text_y = (n.pos.y + 4)
+        bg_y = (n.pos.y + 4 - 11)
         sb.append("<rect x='" + (n.pos.x - 16) + "' y='" + (n.pos.y - 16) + "' width='32' height='32' style='fill: #FFFFFF;'></rect>\n")
 
       } else {

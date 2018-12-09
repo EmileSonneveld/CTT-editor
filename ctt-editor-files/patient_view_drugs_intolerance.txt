@@ -1,0 +1,20 @@
+patient_view_drugs_intolerance
+	access_list*
+		show_list_alphabetical_order
+		|||
+		filter
+			by_molecule
+				show list molecule
+				|||
+				filter by mol name
+				[]>>
+				select molecule
+			[]
+			by_drug
+				show_list_drug
+				|||
+				filter_by_drug_name
+				[>
+				select_drug
+	[>
+	quit

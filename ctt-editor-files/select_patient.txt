@@ -1,0 +1,21 @@
+select_patient_tastk
+	by_name
+		enter_name
+			enter_first name
+			|||
+			enter last name
+		|[]|
+		show_patient_list
+			show_no_found
+			[]
+			select_from_list
+				show_patients
+				[]>>
+				select_patient
+	[]
+	by_id
+		enter_id
+		[]>>
+		confirm
+	[>
+	return_patient

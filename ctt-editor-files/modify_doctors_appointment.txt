@@ -1,0 +1,16 @@
+modify_doctors_appointment
+	select_doctor
+	[]>>
+	show_appointments
+	[]>>
+	select_appointment
+	[]>>
+	modify_appointment*
+		set_date
+		|||
+		set_patient
+		|||
+		delete_appointment
+	[>
+	done
+	

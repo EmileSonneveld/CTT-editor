@@ -1,0 +1,16 @@
+view_drugs_prescription
+	open_prescription_menu
+	>>
+	searching_proccess*
+		show_prescriptions
+		|[]|
+		enter_name_filter
+		|[]|
+		sort
+			by_type
+			[]
+			by_name
+			[]
+			by_date
+	[>
+	quit

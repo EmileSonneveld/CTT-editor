@@ -1,0 +1,16 @@
+patient_view_vaccination
+	acces_list*
+		show_list
+		|||
+		filter
+			previous
+			[]
+			future
+			[]
+			per_type
+				show_type_list
+				|[]|
+				select_type
+	[>
+	close
+	

@@ -1,0 +1,24 @@
+view_in_calendar
+	show calendar
+		show day
+		[]
+		show week
+		[]
+		show month
+		[]
+		show year
+	|||
+	change viewport
+		go_previous
+		[]
+		go_next
+		[]
+		select in month calendar
+			specify_viewport
+				go_previous_month
+				[]
+				go_next_month
+				[]
+				select_day_viewport
+			|||
+			show month calendar

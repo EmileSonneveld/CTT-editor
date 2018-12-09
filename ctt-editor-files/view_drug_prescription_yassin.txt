@@ -1,0 +1,10 @@
+view_drug_prescription_yassin
+	acces list
+		show in alphabetical order
+		|||
+		filter
+			show list
+			|[]|
+			set alphabetical order
+	[>
+	quit

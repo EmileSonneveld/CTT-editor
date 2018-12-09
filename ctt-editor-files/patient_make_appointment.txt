@@ -1,0 +1,28 @@
+patient_make_appointment
+	by website
+		specify_doctor
+		>>
+		specify date
+		>>
+		check feasibility
+		>>
+		following
+			ok
+				ask for confirmation
+				>>
+				confirm
+			[]
+			not ok
+				show data not available
+				>>
+				suggest other date
+				>>
+				user choice
+					accept
+						select_date
+						[]>>
+						show confirmation message
+					[]
+					cancel_procedure
+	[]
+	by phone
