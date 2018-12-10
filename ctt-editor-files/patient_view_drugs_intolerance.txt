@@ -6,7 +6,7 @@ patient_view_drugs_intolerance
 			by_molecule
 				show list molecule
 				|||
-				filter by mol name
+				filter by molecule name
 				[]>>
 				select molecule
 			[]

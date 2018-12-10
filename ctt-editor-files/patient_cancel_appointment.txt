@@ -1,4 +1,3 @@
-
 cancel_appointment
 	do_cancel
 		find_appointment
@@ -13,10 +12,10 @@ cancel_appointment
 				select_from_list
 		[]>>
 		check_date
-			date_in_7d
+			date_in_7days
 				show_facturation_msg
 			[]
-			date_after_7D
+			date_after_7days
 				show nothing
 		>>
 		ask_confirmation

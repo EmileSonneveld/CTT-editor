@@ -1,7 +1,7 @@
 view_drugs_prescription
 	open_prescription_menu
 	>>
-	searching_proccess*
+	searching_process*
 		show_prescriptions
 		|[]|
 		enter_name_filter

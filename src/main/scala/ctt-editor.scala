@@ -20,29 +20,38 @@ class Vector2D(_x: Double, _y: Double) {
 
 object CttEditor {
 
-  var cttArea: HTMLTextAreaElement = _
-  var cttHolder: Element = _
-  var cttFiles: HTMLSelectElement = _
+  var cttArea: HTMLTextAreaElement = dom.document.body.querySelector("#ctt-texarea").asInstanceOf[HTMLTextAreaElement]
+  var cttHolder: Element = dom.document.body.querySelector("#ctt-holder")
+  var cttFiles: HTMLSelectElement = dom.document.body.querySelector("#ctt-files").asInstanceOf[HTMLSelectElement]
+  var cttFilter: HTMLInputElement = dom.document.body.querySelector("#ctt-filter").asInstanceOf[HTMLInputElement]
+  var cttMake: Element = dom.document.body.querySelector("#ctt-make")
 
 
   def main(args: Array[String]): Unit = {
     println(args.mkString(", "))
     //if(dom.document == null) return
 
-    cttHolder = dom.document.body.querySelector("#ctt-holder")
-    cttArea = dom.document.body.querySelector("#ctt-texarea").asInstanceOf[HTMLTextAreaElement]
+    cttFilter.addEventListener("change", cttFilterChanged)
+    cttFilter.addEventListener("keyup", cttFilterChanged)
+
+    cttMake.addEventListener("click", makeNewCtt)
+
     cttArea.addEventListener("change", cttChanged)
     cttArea.addEventListener("keyup", cttChanged)
 
-    cttFiles = dom.document.body.querySelector("#ctt-files").asInstanceOf[HTMLSelectElement]
     cttFiles.addEventListener("change", selectedFileChanged)
 
+    loadFileList()
 
+    cttFiles.selectedIndex = 0 // doesn't trigger the on change
+    selectedFileChanged(null)
+  }
+
+  private def loadFileList():Unit = {
     val oReq = new XMLHttpRequest()
     oReq.addEventListener("load", gotFileNames)
-    oReq.open("GET", "../ctt-editor-files/") //, async = false)
+    oReq.open("GET", "../ctt-editor-files/", async = false)
     oReq.send()
-
   }
 
   private def gotFileNames(evt: Event): Unit = {
@@ -50,15 +59,51 @@ object CttEditor {
     val json = Json.parse(files).as[List[JsValue]]
 
     val innerHtml = json.map(x => {
-      var nameOrig = "" + x("name").asInstanceOf[JsString].value
+      val nameOrig = "" + x("name").asInstanceOf[JsString].value
       var name = nameOrig
       if (name.endsWith(".txt")) name = name.substring(0, name.length - ".txt".length)
       s"<option value='${nameOrig}'>${name}</option>"
     }).mkString("\n")
     cttFiles.innerHTML = innerHtml
+  }
 
-    cttFiles.selectedIndex = 0 // doesn't trigger the on change
-    selectedFileChanged(null)
+  private def cttFilterChanged(evt:Event) = {
+    val filterValue = cttFilter.value
+    var children = cttFiles.children
+    var atLeastOneVisible = false
+    for(i<- 0 until children.length)
+    //for (var i = 0; i < children.length; i+=1)
+    {
+      var child = children(i).asInstanceOf[HTMLOptionElement]
+      if(child.value.contains(filterValue)){
+        child.removeAttribute("hidden")
+        atLeastOneVisible = true
+      }
+      else
+        child.setAttribute("hidden", "")
+    }
+
+    if(atLeastOneVisible)
+      cttMake.setAttribute("hidden", "")
+    else
+      cttMake.removeAttribute("hidden")
+  }
+
+  private def makeNewCtt(evt:Event):Unit = {
+    var newCttName = cttFilter.value
+    if(!newCttName.endsWith(".txt"))
+      newCttName+=".txt"
+
+    {
+      val oReq = new XMLHttpRequest()
+      //oReq.addEventListener("load", fileUploaded)
+      oReq.open("POST", "../ctt-editor-files/" + newCttName, async = false)
+      oReq.setRequestHeader("file_content", URIUtils.encodeURI("")) // empty file
+      oReq.send()
+    }
+    loadFileList()
+    cttFiles.value = newCttName
+    cttArea.value = ""
   }
 
   private def selectedFileChanged(evt: Event): Unit = {

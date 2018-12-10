@@ -1,5 +1,5 @@
 view_patient_list
-	acces_list*
+	access_list*
 		show list
 		[]>>
 		filter

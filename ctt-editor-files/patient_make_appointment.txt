@@ -7,12 +7,12 @@ patient_make_appointment
 		check feasibility
 		>>
 		following
-			ok
+			OK
 				ask for confirmation
 				>>
 				confirm
 			[]
-			not ok
+			not OK
 				show data not available
 				>>
 				suggest other date

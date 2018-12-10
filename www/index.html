@@ -4,14 +4,14 @@
 	<title></title>
     <link rel="icon" href="data:;base64,iVBORw0KGgo="> <!-- Don't request favicon -->
 	<style type="text/css">
-select {
-	min-width: 300px;
+/*select {
+	
 	min-height: 45px;
 	max-height: 100%
 	border-width: 3px;
 	border-color: rgba(50, 50, 50, 0.14);
 	margin: 10px 10px 10px 0px;
-}
+}*/
 html, body {
 	height: 100%;
 	margin: 0;
@@ -25,9 +25,13 @@ html, body {
 <div style="display:flex; flex-direction:column; height: 100%;">
 
 	<div style="display:flex; flex-direction:row; height: 400px; resize:vertical; overflow:auto;">
-		<select id="ctt-files" size="9" style="">
-			<option value="acces_schedule.txt">acces_schedule.txt</option>
-		</select>
+		<div style="display:flex; flex-direction:column;min-width: 300px; margin:5px">
+			<input type="text" id="ctt-filter" style="border-radius: 5px 5px 0px 0px; padding: 2px;">
+			<button id="ctt-make">Make new CTT</button>
+			<select id="ctt-files" size="9" style="height: 100%">
+				<option value="acces_schedule.txt">acces_schedule.txt</option>
+			</select>
+		</div>
 		<textarea id="ctt-texarea" style="width: 100%; tab-size: 2; min-width: 200px; background: antiquewhite; resize:none;">
 example
 	branch_a
