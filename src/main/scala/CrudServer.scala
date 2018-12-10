@@ -6,17 +6,20 @@ import java.io.ByteArrayOutputStream
 import java.net.URLDecoder
 import java.nio.file.Paths
 import java.net.URLDecoder
-
+import java.awt.Desktop
+import java.net.URI
 
 import com.sun.net.httpserver.{HttpExchange, HttpHandler, HttpServer}
 
 
 object CrudServer extends App {
-  var server = HttpServer.create(new InetSocketAddress(8000), 0)
+  var server = HttpServer.create(new InetSocketAddress(6773), 0) // Port number is 'CTTE' written in bad 1337
   server.createContext("/", new StaticHandler())
   server.setExecutor(null) // creates a default executor
   server.start()
-  println("Server has started. Open his url in a browser: http://localhost:8000/www/")
+  println("Server has started. Open his url in a browser: http://localhost:6773/www/")
+
+  if (Desktop.isDesktopSupported) Desktop.getDesktop.browse(new URI("http://localhost:6773/www/"))
 
   // Inspired from: https://github.com/ianopolous/simple-http-server/blob/master/src/http/StaticHandler.java
   class StaticHandler extends HttpHandler {
@@ -37,7 +40,7 @@ object CrudServer extends App {
       path = path.replaceAll("//", "/")
 
       var res: Asset = null
-      var status: Int = 500 // If not changed, we throw an error
+      var status = 500 // If not changed, we throw an error
       try {
         println(httpExchange.getRequestMethod + " " + httpExchange.getRequestURI.getPath)
         if (httpExchange.getRequestMethod == "POST") {

@@ -12,6 +12,7 @@ access_schedule_doctor
 				enter month
 				>>
 				enter year
+				>>
 				check date validity
 					date is valid
 						update schedule UI

@@ -33,12 +33,15 @@ html, body {
 			</select>
             <div><input type="checkbox" id="ctt-normlize"></input>Draw normailzed CTT</div>
 		</div>
-		<textarea id="ctt-texarea" style="width: 100%; tab-size: 2; min-width: 200px; background: antiquewhite; resize:none;">
+        <div style="display:flex; flex-direction:column;min-width: 300px; margin:5px">
+		  <textarea id="ctt-texarea" style="width: 100%; min-width: 200px; height: 100%; tab-size: 2; background: antiquewhite; resize:none;">
 example
 	branch_a
 	||
 	branch_b
-		</textarea>
+    		</textarea>
+            <span style="color: red" id="ctt-message"></span>
+        </div>
         <div id="ctt-ets" style="width: 100%; min-width: 200px;">
             {enabled task set should appear here}<br/>
             {enabled task set 2}<br/>

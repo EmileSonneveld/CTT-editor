@@ -22,6 +22,7 @@ object CttEditor {
   var cttMake: Element = dom.document.body.querySelector("#ctt-make")
   var cttEts: HTMLDivElement = dom.document.body.querySelector("#ctt-ets").asInstanceOf[HTMLDivElement]
   var cttNormalize: HTMLInputElement = dom.document.body.querySelector("#ctt-normlize").asInstanceOf[HTMLInputElement]
+  var cttMessage: HTMLInputElement = dom.document.body.querySelector("#ctt-message").asInstanceOf[HTMLInputElement]
 
   def main(args: Array[String]): Unit = {
     println(args.mkString(", "))
@@ -114,27 +115,42 @@ object CttEditor {
   }
 
   def cttChanged(evt: Event): Unit = {
+    try {
+      cttMessage.innerHTML = ""
 
-    val ctt_code = cttArea.value
-    val ctt = StaticUtil.linear_parse_ctt(ctt_code)
-    if (cttNormalize.checked)
-      StaticUtil.normalise_ctt(ctt)
-    cttHolder.innerHTML = StaticUtil.ctt_code_to_svg(ctt)
-    if (!cttNormalize.checked)
-      StaticUtil.normalise_ctt(ctt)
-    cttEts.innerHTML = StaticUtil.ctt_to_enabled_task_sets(ctt).toString.replace("\n", "<br/>\n")
+      val ctt_code = cttArea.value
+      val ctt = StaticUtil.linear_parse_ctt(ctt_code)
+      if (cttNormalize.checked)
+        StaticUtil.normalise_ctt(ctt)
+      cttHolder.innerHTML = StaticUtil.ctt_code_to_svg(ctt)
+      if (!cttNormalize.checked)
+        StaticUtil.normalise_ctt(ctt)
+      cttEts.innerHTML = StaticUtil.ctt_to_enabled_task_sets(ctt).toString.replace("\n", "<br/>\n")
 
-    val oReq = new XMLHttpRequest()
-    oReq.addEventListener("load", fileUploaded)
-    oReq.open("POST", "../ctt-editor-files/" + cttFiles.value) //, async = false)
-    oReq.setRequestHeader("file_content", URIUtils.encodeURI(ctt_code))
-    oReq.send()
+      val oReq = new XMLHttpRequest()
+      oReq.addEventListener("load", fileUploaded)
+      oReq.addEventListener("error", fileUploadFailed);
+      oReq.open("POST", "../ctt-editor-files/" + cttFiles.value) //, async = false)
+      oReq.setRequestHeader("file_content", URIUtils.encodeURI(ctt_code))
+      oReq.send()
 
-    println("cttChanged and was valid")
+      println("cttChanged and was valid")
+    } catch {
+      case (e: Throwable) => {
+        cttMessage.innerHTML = e.getMessage
+      }
+    }
   }
 
   def fileUploaded(evt: Event) = {
+    cttMessage.innerHTML = ""
+  }
 
+  def fileUploadFailed(evt: Event) = {
+    if (dom.window.location.protocol == "file:")
+      cttMessage.innerHTML = "CTT upload failed. <br/>This app should be accesed trough a webserver, not as a plain HTML-file."
+    else
+      cttMessage.innerHTML = "CTT upload failed. <br/>Submit issue here: https://github.com/EmileSonneveld/CTT-editor"
   }
 
 
