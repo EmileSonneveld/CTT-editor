@@ -23,6 +23,44 @@ class EnabledTaskSets {
 
 object StaticUtil {
 
+  def normalise_ctt(ctt: CttNode): Unit = {
+    println("normalise_ctt")
+
+    def rec(n: CttNode): Unit = {
+
+      if (n.children.length > 3) {
+        var i = 1 // Only loop odd indexes, they will contain the operators
+        while (i < n.children.length) {
+          val child = n.children(i)
+          val op = child.Operator()
+          assert(op != null)
+
+          if (op.priority == 1) {
+            val left = n.children(i - 1)
+            val right = n.children(i + 1)
+            val newNode = new CttNode
+            n.children.remove(i + 1)
+            n.children.remove(i)
+            n.children.remove(i - 1)
+
+            newNode.name = "(" + left.name + " & " + right.name + ")"
+            newNode.children += left
+            newNode.children += child
+            newNode.children += right
+            n.children.insert(i - 1, newNode)
+          }
+
+          i += 2
+        }
+      }
+      for (child <- n.children)
+        rec(child)
+    }
+
+    rec(ctt)
+  }
+
+
   def ctt_to_enabled_task_sets(ctt: CttNode): EnabledTaskSets = {
     var etss = new EnabledTaskSets();
     {
@@ -46,8 +84,8 @@ object StaticUtil {
 
             var lastOperator = ""
             for (child <- task.children) {
-              if (child.IsOpperator())
-                lastOperator = child.name
+              if (child.Operator() != null)
+                lastOperator = child.Operator().name
               else {
                 if (lastOperator == "" // Still the first element / head. This is always added
                   || lastOperator == "[]"
@@ -77,6 +115,20 @@ object StaticUtil {
       }
     }
 
+    // Todo: put in a loop obviously...
+    level_pass()
+    level_pass()
+    level_pass()
+    level_pass()
+    level_pass()
+    level_pass()
+    level_pass()
+    level_pass()
+    level_pass()
+    level_pass()
+    level_pass()
+    level_pass()
+    level_pass()
     level_pass()
     level_pass()
     return etss
@@ -184,12 +236,13 @@ object StaticUtil {
         get_lowest_y(child)
       }
     }
+
     get_lowest_y(node)
     lowest_y += 26 + 15 // Node uses center position. Compencate for text label.
 
     val sb = new StringBuilder
     sb.append("<?xml version='1.0' encoding='UTF-8' ?>\n")
-    sb.append("<svg width='" + (node.width + 32) + "' height='" + lowest_y  + "' xmlns='http://www.w3.org/2000/svg' version='1.1'>\n")
+    sb.append("<svg width='" + (node.width + 32) + "' height='" + lowest_y + "' xmlns='http://www.w3.org/2000/svg' version='1.1'>\n")
 
     def render_recurse_lines(n: CttNode): Unit = {
 

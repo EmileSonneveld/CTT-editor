@@ -31,6 +31,7 @@ html, body {
 			<select id="ctt-files" size="9" style="height: 100%">
 				<option value="acces_schedule.txt">acces_schedule.txt</option>
 			</select>
+            <div><input type="checkbox" id="ctt-normlize"></input>Draw normailzed CTT</div>
 		</div>
 		<textarea id="ctt-texarea" style="width: 100%; tab-size: 2; min-width: 200px; background: antiquewhite; resize:none;">
 example
@@ -39,11 +40,11 @@ example
 	branch_b
 		</textarea>
         <div id="ctt-ets" style="width: 100%; min-width: 200px;">
-            {enabled task set 1}<br/>
+            {enabled task set should appear here}<br/>
             {enabled task set 2}<br/>
         </div>
 	</div>
-	<div id="ctt-holder" style="height: 100%; overflow: scroll;">test</div>
+	<div id="ctt-holder" style="height: 100%; overflow: scroll;">(CTT-SVG should appear here)</div>
 </div>
 
 <script src="../target/scala-2.12/ctt-editor-fastopt.js"></script>

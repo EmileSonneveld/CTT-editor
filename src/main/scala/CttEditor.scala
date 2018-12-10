@@ -13,7 +13,6 @@ import scala.scalajs.js.{JSON, URIUtils}
 import play.api.libs.json._
 
 
-
 object CttEditor {
 
   var cttArea: HTMLTextAreaElement = dom.document.body.querySelector("#ctt-texarea").asInstanceOf[HTMLTextAreaElement]
@@ -21,7 +20,8 @@ object CttEditor {
   var cttFiles: HTMLSelectElement = dom.document.body.querySelector("#ctt-files").asInstanceOf[HTMLSelectElement]
   var cttFilter: HTMLInputElement = dom.document.body.querySelector("#ctt-filter").asInstanceOf[HTMLInputElement]
   var cttMake: Element = dom.document.body.querySelector("#ctt-make")
-  var cttEts:HTMLDivElement = dom.document.body.querySelector("#ctt-ets").asInstanceOf[HTMLDivElement]
+  var cttEts: HTMLDivElement = dom.document.body.querySelector("#ctt-ets").asInstanceOf[HTMLDivElement]
+  var cttNormalize: HTMLInputElement = dom.document.body.querySelector("#ctt-normlize").asInstanceOf[HTMLInputElement]
 
   def main(args: Array[String]): Unit = {
     println(args.mkString(", "))
@@ -35,7 +35,10 @@ object CttEditor {
     cttArea.addEventListener("change", cttChanged)
     cttArea.addEventListener("keyup", cttChanged)
 
+    cttNormalize.addEventListener("change", cttChanged)
+
     cttFiles.addEventListener("change", selectedFileChanged)
+
 
     loadFileList()
 
@@ -113,7 +116,11 @@ object CttEditor {
 
     val ctt_code = cttArea.value
     val ctt = StaticUtil.linear_parse_ctt(ctt_code)
+    if (cttNormalize.checked)
+      StaticUtil.normalise_ctt(ctt)
     cttHolder.innerHTML = StaticUtil.ctt_code_to_svg(ctt)
+    if (!cttNormalize.checked)
+      StaticUtil.normalise_ctt(ctt)
     cttEts.innerHTML = StaticUtil.ctt_to_enabled_task_sets(ctt).toString.replace("\n", "<br/>\n")
 
     val oReq = new XMLHttpRequest()
@@ -136,9 +143,6 @@ object CttEditor {
     cttArea.value = ctt_code
     cttChanged(null)
   }
-
-
-
 
 
   def appendPar(targetNode: dom.Node, text: String): Unit = {

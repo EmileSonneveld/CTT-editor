@@ -66,4 +66,19 @@ class CttEditorTest extends FunSuite {
     str.replace("\r", "").trim.toLowerCase()
   }
 
+  test("normalize") {
+    val ctt_code = """Root
+	Task 1
+	>>
+	Task 2
+	[]
+	Task 3"""
+    val ctt = StaticUtil.linear_parse_ctt(ctt_code)
+    println(StaticUtil.print_ctt(ctt))
+
+    StaticUtil.normalise_ctt(ctt)
+
+    println(StaticUtil.print_ctt(ctt))
+  }
+
 }
