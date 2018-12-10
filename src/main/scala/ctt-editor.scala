@@ -160,10 +160,12 @@ object CttEditor {
 
     def GetIconName(): String = {
       if (children.size > 0) return "abstraction.gif"
-      if (operators.contains(name)) return ""
-      if (name.startsWith("show")
-        || name.startsWith("check")
-        || name.startsWith("is")) return "application.gif"
+      val n = name.toLowerCase()
+      if (operators.contains(n)) return ""
+      if (n.startsWith("show")
+        || n.startsWith("check")
+        || n.startsWith("print")
+        || n.startsWith("is")) return "application.gif"
       return "interaction.gif"
     }
 

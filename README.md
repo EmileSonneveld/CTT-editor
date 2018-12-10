@@ -8,7 +8,15 @@ A straightforward way to write CTTs in plain text, with a fast visualiser.
 TODO:
 -----
 Be able to refer to tasks defined in an other file.
+Generate enabled task sets
 Generate HTML pages from CTT
+Check CTT on problems:
+	Syntax in text file
+	exercise 1: A looping task without deactivation
+	exercise 2: Or operations [] between optional tasks
+	exercise 3: Ambiguety in order of operations
+	exercise 4: Select task, before shomething is shown
+	exercise 6: UI specific words, like 'click'
 
 
 Some things I learned:

@@ -1,0 +1,24 @@
+File Managing
+	Editing
+		Open File
+		[]>>
+		Edit
+			Insert
+			|[]|
+			Cut
+			|[]|
+			Scroll
+	[]
+	Printing
+		Select print
+		>>
+		Handle Printing
+			Select printer
+			[]>>
+			Select pages
+			[]>>
+			Print
+	[]
+	Deleting
+	[>
+	close
