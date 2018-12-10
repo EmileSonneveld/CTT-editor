@@ -1,25 +1,26 @@
 CTT-editor
 ==========
 
-Concurrent task tree editor
+Concurrent Task Tree editor
+
 A straightforward way to write CTTs in plain text, with a fast visualiser.
 
 
 TODO:
 -----
-Be able to refer to tasks defined in another file.
-Generate enabled task sets
-- Check more cases with Disabling task
-- Allow to collapse []>> operators
-- Slide 11, how does second way to interpret an [optional-task] work?
-Generate HTML pages from CTT
-Check CTT on problems:
-- Syntax in text file
-- exercise 1: A looping task without deactivation
-- exercise 2: Or operations [] between optional tasks
-- exercise 3: Ambiguity in order of operations
-- exercise 4: Select task, before something is shown
-- exercise 6: UI specific words, like 'click'
+- Be able to refer to tasks defined in another file.
+- Generate enabled task sets
+	- Check more cases with Disabling task
+	- Allow to collapse []>> operators
+	- Slide 11, how does second way to interpret an [optional-task] work?
+- Generate HTML pages from CTT
+- Check CTT on problems:
+	- Syntax in text file
+	- exercise 1: A looping task without deactivation
+	- exercise 2: Or operations [] between optional tasks
+	- exercise 3: Ambiguity in order of operations
+	- exercise 4: Select task, before something is shown
+	- exercise 6: UI specific words, like 'click'
 
 
 Some things I learned:
