@@ -1,48 +1,10 @@
 package main.scala
 
-
 import scala.collection.mutable.{ListBuffer, Stack}
 
 
-class Vector2D(_x: Double, _y: Double) {
-  var x: Double = _x
-  var y: Double = _y
-}
 
 
-class CttNode {
-  val operators = List("|=|", "[]", "|||", "|[]|", "||", "[>", ">>", "[]>>", "|>")
-
-
-  var name = "untitled_node"
-  var children: ListBuffer[CttNode] = ListBuffer[CttNode]()
-  var pos = new Vector2D(-1, -1)
-  var width: Double = -1 // not calculated yet
-
-  def minimumWidth(): Double = {
-    Math.max(32, name.length * 6) // need to render in fixed width font
-  }
-
-  def IsOpperator(): Boolean = {
-    val n = name.toLowerCase()
-    operators.contains(n)
-  }
-
-  def GetIconName(): String = {
-    if (children.size > 0) return "abstraction.gif"
-    val n = name.toLowerCase()
-    if (IsOpperator()) return ""
-    if (n.startsWith("show")
-      || n.startsWith("check")
-      || n.startsWith("print")
-      || n.startsWith("is")) return "application.gif"
-    return "interaction.gif"
-  }
-
-  override def toString = {
-    name
-  }
-}
 
 class EnabledTaskSet {
   var tasks = ListBuffer[CttNode]()
@@ -51,6 +13,7 @@ class EnabledTaskSet {
     "{" + tasks.mkString(", ") + "}"
   }
 }
+
 
 class EnabledTaskSets {
   var sets = ListBuffer[EnabledTaskSet]()
@@ -63,10 +26,7 @@ class EnabledTaskSets {
 
 
 
-
-
-
-class StaticUtil {
+object StaticUtil {
 
   def ctt_to_enabled_task_sets(ctt: CttNode): EnabledTaskSets = {
     var etss = new EnabledTaskSets();
@@ -276,9 +236,6 @@ class StaticUtil {
     node.width = Math.max(node.minimumWidth(), acc_children) + (padding * 2)
   }
 
-  def vectorAdd(a: Vector2D, b: Vector2D): Vector2D = {
-    new Vector2D(a.x + b.x, a.y + b.y)
-  }
 
 
   def calculatePosition(node: CttNode, offset: Vector2D = new Vector2D(0, 0)): Unit = {
@@ -288,7 +245,7 @@ class StaticUtil {
     node.pos.y = offset.y
 
     for (child <- node.children) {
-      calculatePosition(child, vectorAdd(offset, new Vector2D(0, sizePerLayer)))
+      calculatePosition(child, Vector2D.add(offset, new Vector2D(0, sizePerLayer)))
       offset.x += child.width
     }
   }

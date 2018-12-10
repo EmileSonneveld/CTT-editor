@@ -14,10 +14,6 @@ import play.api.libs.json._
 
 
 
-
-
-
-
 object CttEditor {
 
   var cttArea: HTMLTextAreaElement = dom.document.body.querySelector("#ctt-texarea").asInstanceOf[HTMLTextAreaElement]
