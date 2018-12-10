@@ -1,7 +1,7 @@
 
 import org.scalatest.FunSuite
-import main.scala.CttEditor.CttNode
-import main.scala.CttEditor
+import main.scala._
+
 import scala.collection.mutable
 import scala.io.Source
 
@@ -39,6 +39,27 @@ class CttEditorTest extends FunSuite {
 
   test("trimming") {
     assert("\n\n\nXXX\n\n\n".trim === "XXX")
+  }
+
+
+  test("ets parsing") {
+    val ctt_code = """Root
+	Task 10
+		Task 12
+		>>
+		Task 13
+	[]
+	Task 11
+		Task 14
+		[]>>
+		Task 15"""
+    val ctt = CttEditor.linear_parse_ctt(ctt_code)
+    val etss = CttEditor.ctt_to_enabled_task_sets(ctt)
+    println(etss)
+    // Sould be something like:
+    // {Task 12, Task 14}
+    // {Task 13}
+    // {Task 15}
   }
 
 }
