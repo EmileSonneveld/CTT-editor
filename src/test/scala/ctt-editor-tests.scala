@@ -32,7 +32,7 @@ class CttEditorTest extends FunSuite {
     StaticUtil.calculateWidth(ctt)
     StaticUtil.calculatePosition(ctt)
 
-    val serialise = StaticUtil.print_ctt(ctt.children(0))
+    val serialise = StaticUtil.print_ctt(ctt)
     assert(fileContents.trim === serialise.trim)
   }
 
@@ -54,12 +54,16 @@ class CttEditorTest extends FunSuite {
 		[]>>
 		Task 15"""
     val ctt = StaticUtil.linear_parse_ctt(ctt_code)
+    println(StaticUtil.print_ctt(ctt))
     val etss = StaticUtil.ctt_to_enabled_task_sets(ctt)
     println(etss)
-    // Sould be something like:
-    // {Task 12, Task 14}
-    // {Task 13}
-    // {Task 15}
+    assert(clean("""{Task 12, Task 14}
+{Task 13}
+{Task 15}""") === clean(etss.toString))
+  }
+
+  def clean(str:String):String = {
+    str.replace("\r", "").trim.toLowerCase()
   }
 
 }

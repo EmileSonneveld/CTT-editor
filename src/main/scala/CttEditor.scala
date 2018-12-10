@@ -21,7 +21,7 @@ object CttEditor {
   var cttFiles: HTMLSelectElement = dom.document.body.querySelector("#ctt-files").asInstanceOf[HTMLSelectElement]
   var cttFilter: HTMLInputElement = dom.document.body.querySelector("#ctt-filter").asInstanceOf[HTMLInputElement]
   var cttMake: Element = dom.document.body.querySelector("#ctt-make")
-
+  var cttEts:HTMLDivElement = dom.document.body.querySelector("#ctt-ets").asInstanceOf[HTMLDivElement]
 
   def main(args: Array[String]): Unit = {
     println(args.mkString(", "))
@@ -112,7 +112,9 @@ object CttEditor {
   def cttChanged(evt: Event): Unit = {
 
     val ctt_code = cttArea.value
-    cttHolder.innerHTML = StaticUtil.ctt_code_to_svg(ctt_code)
+    val ctt = StaticUtil.linear_parse_ctt(ctt_code)
+    cttHolder.innerHTML = StaticUtil.ctt_code_to_svg(ctt)
+    cttEts.innerHTML = StaticUtil.ctt_to_enabled_task_sets(ctt).toString.replace("\n", "<br/>\n")
 
     val oReq = new XMLHttpRequest()
     oReq.addEventListener("load", fileUploaded)

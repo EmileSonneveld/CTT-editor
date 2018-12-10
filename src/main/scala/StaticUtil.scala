@@ -3,9 +3,6 @@ package main.scala
 import scala.collection.mutable.{ListBuffer, Stack}
 
 
-
-
-
 class EnabledTaskSet {
   var tasks = ListBuffer[CttNode]()
 
@@ -22,8 +19,6 @@ class EnabledTaskSets {
     sets.mkString("\n")
   }
 }
-
-
 
 
 object StaticUtil {
@@ -56,18 +51,26 @@ object StaticUtil {
               else {
                 if (lastOperator == "" // Still the first element / head. This is always added
                   || lastOperator == "[]"
+                  || lastOperator == "|=|"
+                  || lastOperator == "||"
+                  || lastOperator == "|||"
+                  || lastOperator == "|[]|"
+                  || lastOperator == "[>" // Todo: Investigate further
+                  || lastOperator == "|>" // Todo: Investigate further
                 ) {
                   ets.tasks.insert(j, child)
                   j += 1
-                } else if(lastOperator == ">>"
-                  || lastOperator == "[]>>"){
-
+                } else if (lastOperator == ">>"
+                  || lastOperator == "[]>>"
+                ) {
                   val ets_new = new EnabledTaskSet()
-                  ets_new.tasks += ctt
-                  etss.sets += ets
+                  ets_new.tasks += child
+                  etss.sets += ets_new
+                  // Todo: Check if disable operator is in range, and add his element to the new ETS
                 }
               }
             }
+            j -= 1 // We would oveshoot a bit at the end of this loop, because we removed a task in the beginning
           }
           j += 1
         }
@@ -75,15 +78,15 @@ object StaticUtil {
     }
 
     level_pass()
+    level_pass()
     return etss
   }
 
 
-  def ctt_code_to_svg(cttCode: String): String = {
-    val ctt = linear_parse_ctt(cttCode)
+  def ctt_code_to_svg(ctt: CttNode): String = {
     calculateWidth(ctt)
     calculatePosition(ctt)
-    val svg = render_ctt_to_svg(ctt.children(0))
+    val svg = render_ctt_to_svg(ctt)
     return svg
   }
 
@@ -130,7 +133,7 @@ object StaticUtil {
       nextCharIndex = ctt_code.indexOf("\n", currentCharIndex + 1) // seek after newline
     }
 
-    return root
+    return root.children(0) // We could support multiple CTTs per file.
   }
 
   def shrink_stack(stack: Stack[CttNode], size: Int): Unit = {
@@ -166,13 +169,27 @@ object StaticUtil {
     }
     return count
   }
+
   def isEmpty(x: String): Boolean = x == null || x.isEmpty
 
 
   def render_ctt_to_svg(node: CttNode): String = {
+
+    var lowest_y: Double = 0
+
+    def get_lowest_y(n: CttNode): Unit = {
+      if (n.pos.y > lowest_y)
+        lowest_y = n.pos.y
+      for (child <- n.children) {
+        get_lowest_y(child)
+      }
+    }
+    get_lowest_y(node)
+    lowest_y += 26 + 15 // Node uses center position. Compencate for text label.
+
     val sb = new StringBuilder
     sb.append("<?xml version='1.0' encoding='UTF-8' ?>\n")
-    sb.append("<svg width='" + (node.width + 32) + "' height='1000' xmlns='http://www.w3.org/2000/svg' version='1.1'>\n")
+    sb.append("<svg width='" + (node.width + 32) + "' height='" + lowest_y  + "' xmlns='http://www.w3.org/2000/svg' version='1.1'>\n")
 
     def render_recurse_lines(n: CttNode): Unit = {
 
@@ -237,8 +254,7 @@ object StaticUtil {
   }
 
 
-
-  def calculatePosition(node: CttNode, offset: Vector2D = new Vector2D(0, 0)): Unit = {
+  def calculatePosition(node: CttNode, offset: Vector2D = new Vector2D(0, 17)): Unit = {
     val sizePerLayer = 60
 
     node.pos.x = offset.x + node.width / 2
