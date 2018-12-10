@@ -1,6 +1,6 @@
 deactivation_test
 	A
-	[]
+	>>
 	B
 	[>
 	C

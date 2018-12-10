@@ -26,11 +26,44 @@ object CttNode {
 }
 
 class CttNode {
-
   var name = "untitled_node"
   var children: ListBuffer[CttNode] = ListBuffer[CttNode]()
   var pos = new Vector2D(-1, -1)
   var width: Double = -1 // not calculated yet
+  var parent: CttNode = _
+
+  def addChild(child: CttNode, index: Int = -1) = {
+    child.parent = this
+    var idx = index
+    if (idx == -1)
+      idx = children.length
+    this.children.insert(idx, child)
+  }
+
+  def findDesactivationTaskRightUp(): CttNode = {
+
+    def rec(n: CttNode): CttNode = {
+      if (n.parent == null) return null
+
+      var passedSelf = false // This mechanism could probably be simpler if we depend on propper CTT-normalisation
+      var passedDisabelingTask = false
+      for (sibling <- n.parent.children) {
+        if (passedSelf) {
+          if (passedDisabelingTask) {
+            return sibling
+          } else {
+            val op = sibling.Operator()
+            if (op != null && op.name == "[>") passedDisabelingTask = true
+          }
+        } else {
+          if (sibling == n) passedSelf = true
+        }
+      }
+      return rec(n.parent)
+    }
+
+    return rec(this)
+  }
 
   def minimumWidth(): Double = {
     Math.max(32, name.length * 6) // need to render in fixed width font

@@ -48,10 +48,10 @@ object StaticUtil {
               n.children.remove(i - 1)
 
               newNode.name = "(" + left.name + " & " + right.name + ")"
-              newNode.children += left
-              newNode.children += child
-              newNode.children += right
-              n.children.insert(i - 1, newNode)
+              newNode.addChild(left)
+              newNode.addChild(child)
+              newNode.addChild(right)
+              n.addChild(newNode, i - 1)
             }
             i += 2
           }
@@ -108,9 +108,11 @@ object StaticUtil {
                 ) {
                   val ets_new = new EnabledTaskSet()
                   ets_new.tasks += child
-                  // Todo: Check if disable operator is in range, and add his element to the new ETS
-                  //val desactivationTask = child.findDesactivationTaskRightUp()
-                  //ets_new.tasks += desactivationTask
+
+                  val desactivationTask = child.findDesactivationTaskRightUp()
+                  if (desactivationTask != null)
+                    ets_new.tasks += desactivationTask
+
                   etss.sets += ets_new
                 }
               }
@@ -185,14 +187,16 @@ object StaticUtil {
 
         indentLevel = leading_tabs
         currentNode = node
-        stack.top.children += node
+        stack.top.addChild(node)
 
       }
       currentCharIndex = nextCharIndex + 1
       nextCharIndex = ctt_code.indexOf("\n", currentCharIndex + 1) // seek after newline
     }
 
-    return root.children(0) // We could support multiple CTTs per file.
+    var firstCtt = root.children(0) // We could support multiple CTTs per file.
+    firstCtt.parent = null
+    return firstCtt
   }
 
   def shrink_stack(stack: Stack[CttNode], size: Int): Unit = {

@@ -29,6 +29,7 @@ object CttEditor {
 
     cttFilter.addEventListener("change", cttFilterChanged)
     cttFilter.addEventListener("keyup", cttFilterChanged)
+    cttFilterChanged(null)
 
     cttMake.addEventListener("click", makeNewCtt)
 
