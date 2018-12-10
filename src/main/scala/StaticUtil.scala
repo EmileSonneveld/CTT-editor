@@ -28,30 +28,35 @@ object StaticUtil {
 
     def rec(n: CttNode): Unit = {
 
-      if (n.children.length > 3) {
-        var i = 1 // Only loop odd indexes, they will contain the operators
-        while (i < n.children.length) {
-          val child = n.children(i)
-          val op = child.Operator()
-          assert(op != null)
+      var prio = 1
+      while (prio <= CttNode.maxCttPriority) {
+        var didSomething = false
+        if (n.children.length > 3) {
+          var i = 1 // Only loop odd indexes, they will contain the operators
+          while (i < n.children.length) {
+            val child = n.children(i)
+            val op = child.Operator()
+            assert(op != null)
 
-          if (op.priority == 1) {
-            val left = n.children(i - 1)
-            val right = n.children(i + 1)
-            val newNode = new CttNode
-            n.children.remove(i + 1)
-            n.children.remove(i)
-            n.children.remove(i - 1)
+            if (op.priority == prio) {
+              didSomething = true
+              val left = n.children(i - 1)
+              val right = n.children(i + 1)
+              val newNode = new CttNode
+              n.children.remove(i + 1)
+              n.children.remove(i)
+              n.children.remove(i - 1)
 
-            newNode.name = "(" + left.name + " & " + right.name + ")"
-            newNode.children += left
-            newNode.children += child
-            newNode.children += right
-            n.children.insert(i - 1, newNode)
+              newNode.name = "(" + left.name + " & " + right.name + ")"
+              newNode.children += left
+              newNode.children += child
+              newNode.children += right
+              n.children.insert(i - 1, newNode)
+            }
+            i += 2
           }
-
-          i += 2
         }
+        if (!didSomething) prio += 1
       }
       for (child <- n.children)
         rec(child)
@@ -103,8 +108,10 @@ object StaticUtil {
                 ) {
                   val ets_new = new EnabledTaskSet()
                   ets_new.tasks += child
-                  etss.sets += ets_new
                   // Todo: Check if disable operator is in range, and add his element to the new ETS
+                  //val desactivationTask = child.findDesactivationTaskRightUp()
+                  //ets_new.tasks += desactivationTask
+                  etss.sets += ets_new
                 }
               }
             }

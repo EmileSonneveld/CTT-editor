@@ -1,0 +1,11 @@
+deactivation_test
+	A
+	[]
+	B
+	[>
+	C
+	>>
+	D
+		lol
+		[>
+		lolz
