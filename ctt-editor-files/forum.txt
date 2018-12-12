@@ -1,0 +1,38 @@
+Forum
+	Posting and reading*
+		Browsing for category
+			Browse*
+				Show categories
+				|[]|
+				select category
+			[>
+			submit category
+		[]>>
+		Show content category
+		|[]|
+		Read and Post*
+			read user
+			|||
+			Post query
+				Enter query
+					Enter title
+					|||
+					Enter content
+				[>
+				Submit
+				[]>>
+				Post on forum application
+			[]
+			Answer or comment
+				Select answer or comment
+				[]>>
+				Enter response
+				[]>>
+				[post]
+					save
+					[]>>
+					Show Application
+		[>
+		Stop category
+	[>
+	Quit

@@ -5,6 +5,8 @@ Concurrent Task Tree editor
 
 A straightforward way to write CTTs in plain text, with a fast visualiser.
 
+How task icons are chosen: https://github.com/EmileSonneveld/CTT-editor/blob/7f2391744df4d7847f39485492f7d333b830e677/src/main/scala/CttNode.scala#L91-L101
+How operator priority is defined: https://github.com/EmileSonneveld/CTT-editor/blob/7f2391744df4d7847f39485492f7d333b830e677/src/main/scala/CttNode.scala#L9-L20
 
 TODO:
 -----
