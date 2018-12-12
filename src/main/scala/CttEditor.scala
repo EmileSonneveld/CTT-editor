@@ -23,10 +23,13 @@ object CttEditor {
   var cttEts: HTMLDivElement = dom.document.body.querySelector("#ctt-ets").asInstanceOf[HTMLDivElement]
   var cttNormalize: HTMLInputElement = dom.document.body.querySelector("#ctt-normlize").asInstanceOf[HTMLInputElement]
   var cttMessage: HTMLInputElement = dom.document.body.querySelector("#ctt-message").asInstanceOf[HTMLInputElement]
+  var cttSvgDownload: Element = dom.document.body.querySelector("#ctt-svg-download")
 
   def main(args: Array[String]): Unit = {
     println(args.mkString(", "))
     //if(dom.document == null) return
+
+    cttSvgDownload.addEventListener("click", cttSvgDownloadClicked)
 
     cttFilter.addEventListener("change", cttFilterChanged)
     cttFilter.addEventListener("keyup", cttFilterChanged)
@@ -46,6 +49,25 @@ object CttEditor {
 
     cttFiles.selectedIndex = 0 // doesn't trigger the on change
     selectedFileChanged(null)
+  }
+
+  def download(filename:String, text:String) {
+    var element = document.createElement("a").asInstanceOf[HTMLLinkElement]
+    element.setAttribute("href", "data:image/svg+xml;charset=utf-8," + URIUtils.encodeURIComponent(text))
+    element.setAttribute("download", filename)
+    element.style.display = "none"
+    document.body.appendChild(element)
+    element.click()
+    document.body.removeChild(element)
+  }
+
+  private def cttSvgDownloadClicked(evt:Event) = {
+    val newCttName = cttFiles.value + ".svg"
+    val ctt = StaticUtil.linear_parse_ctt(this.cttArea.value)
+    if (cttNormalize.checked)
+      StaticUtil.normalise_ctt(ctt)
+    val svg = StaticUtil.ctt_code_to_svg(ctt)
+    download(newCttName, svg)
   }
 
   private def loadFileList(): Unit = {

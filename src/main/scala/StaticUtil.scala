@@ -23,6 +23,15 @@ class EnabledTaskSets {
 
 object StaticUtil {
 
+  def escapeXml(unsafe: String): String = {
+    return unsafe
+      .replace("&", "&amp;") // Should be first
+      .replace("<", "&lt;")
+      .replace(">", "&gt;")
+      .replace("\'", "&apos;")
+      .replace("\"", "&quot;")
+  }
+
   def normalise_ctt(ctt: CttNode): Unit = {
     println("normalise_ctt")
 
@@ -253,18 +262,18 @@ object StaticUtil {
 
     val sb = new StringBuilder
     sb.append("<?xml version='1.0' encoding='UTF-8' ?>\n")
-    sb.append("<svg width='" + (node.width + 32) + "' height='" + lowest_y + "' xmlns='http://www.w3.org/2000/svg' version='1.1'>\n")
+    sb.append("<svg width='" + (node.width + 32) + "' height='" + lowest_y + "' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' version='1.1'>\n")
 
     def render_recurse_lines(n: CttNode): Unit = {
 
       var prevChild: CttNode = null
       for (child <- n.children) {
         if (prevChild != null) {
-          sb.append("<line x1='" + (prevChild.pos.x + 17) + "' y1='" + (prevChild.pos.y + 0.5) + "' x2='" + (child.pos.x - 17) + "' y2='" + (prevChild.pos.y + 0.5) + "' style='stroke-width: 1; stroke: rgb(10, 10, 10);'></line>\n")
+          sb.append("<line x1='" + (prevChild.pos.x + 17) + "' y1='" + (prevChild.pos.y + 0.5) + "' x2='" + (child.pos.x - 17) + "' y2='" + (prevChild.pos.y + 0.5) + "' style='stroke-width: 1; stroke:#0a0a0a'></line>\n")
         }
         val icon = child.GetIconName()
         if (!isEmpty(icon)) {
-          sb.append("<line x1='" + (n.pos.x) + "' y1='" + (n.pos.y + 16) + "' x2='" + child.pos.x + "' y2='" + (child.pos.y - 16) + "' style='stroke-width: 1; stroke: rgba(10, 10, 10, 200);'></line>\n")
+          sb.append("<line x1='" + (n.pos.x) + "' y1='" + (n.pos.y + 16) + "' x2='" + child.pos.x + "' y2='" + (child.pos.y - 16) + "' style='stroke-width: 1; stroke:#0a0a0a; fill-opacity:0.7;'></line>\n")
         }
         render_recurse_lines(child)
         prevChild = child
@@ -278,17 +287,19 @@ object StaticUtil {
       if (icon == "") {
         text_y = (n.pos.y + 4)
         bg_y = (n.pos.y + 4 - 11)
-        sb.append("<rect x='" + (n.pos.x - 16) + "' y='" + (n.pos.y - 16) + "' width='32' height='32' style='fill: #FFFFFF;'></rect>\n")
+        sb.append("<rect x='" + (n.pos.x - 16) + "' y='" + (n.pos.y - 16) + "' width='32' height='32' style='fill:#FFFFFF; fill-opacity:0.7;'></rect>\n")
 
       } else {
         text_y = (n.pos.y + 26)
         bg_y = (n.pos.y + 26 - 11)
-        sb.append("<image x='" + (n.pos.x - 16) + "' y='" + (n.pos.y - 16) + "' width='32' height='32' href='" + icon + "' visibility='visible'></image>\n")
+        sb.append("<image x='" + (n.pos.x - 16) + "' y='" + (n.pos.y - 16) + "' width='32' height='32' xlink:href='" + icon + "' visibility='visible'></image>\n")
       }
-      val nam = n.displayName()
-      val w = (nam.length * 7.2)
-      sb.append("<rect x='" + (n.pos.x - nam.length * 3) + "' y='" + bg_y + "' width='" + w + "' height='15' style='fill: rgba(255, 255, 255, 0.7);'></rect>\n")
-      sb.append("<text x='" + (n.pos.x - nam.length * 3) + "' y='" + text_y + "' width='" + w + "' height='15' style='font-family: monospace;'>" + nam + "</text>\n")
+      var nam = n.displayName()
+      val nam_len = nam.length
+      val w = (nam_len * 7.2)
+      nam = escapeXml(nam)
+      sb.append("<rect x='" + (n.pos.x - nam_len * 3) + "' y='" + bg_y + "' width='" + w + "' height='15' style='fill:#FFFFFF; fill-opacity:0.7;'></rect>\n")
+      sb.append("<text x='" + (n.pos.x - nam_len * 3) + "' y='" + text_y + "' width='" + w + "' height='15' style='font-family: monospace;'>" + nam + "</text>\n")
 
 
       for (child <- n.children) {

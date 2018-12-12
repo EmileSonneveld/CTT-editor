@@ -3541,6 +3541,7 @@ function $c_Lmain_scala_CttEditor$() {
   this.cttEts$1 = null;
   this.cttNormalize$1 = null;
   this.cttMessage$1 = null;
+  this.cttSvgDownload$1 = null;
   this.wantToUpladCtt$1 = false;
   this.cttUploadingInProccess$1 = false
 }
@@ -3569,6 +3570,7 @@ $c_Lmain_scala_CttEditor$.prototype.init___ = (function() {
   this.cttEts$1 = $m_Lorg_scalajs_dom_package$().document__Lorg_scalajs_dom_raw_HTMLDocument().body.querySelector("#ctt-ets");
   this.cttNormalize$1 = $m_Lorg_scalajs_dom_package$().document__Lorg_scalajs_dom_raw_HTMLDocument().body.querySelector("#ctt-normlize");
   this.cttMessage$1 = $m_Lorg_scalajs_dom_package$().document__Lorg_scalajs_dom_raw_HTMLDocument().body.querySelector("#ctt-message");
+  this.cttSvgDownload$1 = $m_Lorg_scalajs_dom_package$().document__Lorg_scalajs_dom_raw_HTMLDocument().body.querySelector("#ctt-svg-download");
   this.wantToUpladCtt$1 = false;
   this.cttUploadingInProccess$1 = false;
   return this
@@ -3601,6 +3603,15 @@ $c_Lmain_scala_CttEditor$.prototype.fileUploadedSucces__Lorg_scalajs_dom_raw_Eve
     $m_Lmain_scala_CttEditor$();
     $m_Lmain_scala_CttEditor$().fileUploaded$unddelayed__V()
   }), 500.0))
+});
+$c_Lmain_scala_CttEditor$.prototype.cttSvgDownloadClicked__p1__Lorg_scalajs_dom_raw_Event__V = (function(evt) {
+  var newCttName = ($as_T(this.cttFiles$1.value) + ".svg");
+  var ctt = $m_Lmain_scala_StaticUtil$().linear$undparse$undctt__T__Lmain_scala_CttNode($as_T(this.cttArea$1.value));
+  if ($uZ(this.cttNormalize$1.checked)) {
+    $m_Lmain_scala_StaticUtil$().normalise$undctt__Lmain_scala_CttNode__V(ctt)
+  };
+  var svg = $m_Lmain_scala_StaticUtil$().ctt$undcode$undto$undsvg__Lmain_scala_CttNode__T(ctt);
+  this.download__T__T__V(newCttName, svg)
 });
 $c_Lmain_scala_CttEditor$.prototype.cttFilterChanged__p1__Lorg_scalajs_dom_raw_Event__V = (function(evt) {
   var filterValue = $as_T(this.cttFilter$1.value);
@@ -3723,49 +3734,55 @@ $c_Lmain_scala_CttEditor$.prototype.main__AT__V = (function(args) {
   var this$6 = $m_s_Console$();
   var this$7 = $as_Ljava_io_PrintStream(this$6.outVar$2.v$1);
   this$7.java$lang$JSConsoleBasedPrintStream$$printString__T__V((x + "\n"));
-  var qual$1 = this.cttFilter$1;
+  var qual$1 = this.cttSvgDownload$1;
   var x$2 = (function(arg1$2) {
     $m_Lmain_scala_CttEditor$();
-    $m_Lmain_scala_CttEditor$().cttFilterChanged__p1__Lorg_scalajs_dom_raw_Event__V(arg1$2)
+    $m_Lmain_scala_CttEditor$().cttSvgDownloadClicked__p1__Lorg_scalajs_dom_raw_Event__V(arg1$2)
   });
-  qual$1.addEventListener("change", x$2);
+  qual$1.addEventListener("click", x$2);
   var qual$2 = this.cttFilter$1;
   var x$5 = (function(arg1$2$1) {
     $m_Lmain_scala_CttEditor$();
     $m_Lmain_scala_CttEditor$().cttFilterChanged__p1__Lorg_scalajs_dom_raw_Event__V(arg1$2$1)
   });
-  qual$2.addEventListener("keyup", x$5);
-  this.cttFilterChanged__p1__Lorg_scalajs_dom_raw_Event__V(null);
-  var qual$3 = this.cttMake$1;
+  qual$2.addEventListener("change", x$5);
+  var qual$3 = this.cttFilter$1;
   var x$8 = (function(arg1$2$2) {
     $m_Lmain_scala_CttEditor$();
-    $m_Lmain_scala_CttEditor$().makeNewCtt__p1__Lorg_scalajs_dom_raw_Event__V(arg1$2$2)
+    $m_Lmain_scala_CttEditor$().cttFilterChanged__p1__Lorg_scalajs_dom_raw_Event__V(arg1$2$2)
   });
-  qual$3.addEventListener("click", x$8);
-  var qual$4 = this.cttArea$1;
+  qual$3.addEventListener("keyup", x$8);
+  this.cttFilterChanged__p1__Lorg_scalajs_dom_raw_Event__V(null);
+  var qual$4 = this.cttMake$1;
   var x$11 = (function(arg1$2$3) {
     $m_Lmain_scala_CttEditor$();
-    $m_Lmain_scala_CttEditor$().cttChanged__Lorg_scalajs_dom_raw_Event__V(arg1$2$3)
+    $m_Lmain_scala_CttEditor$().makeNewCtt__p1__Lorg_scalajs_dom_raw_Event__V(arg1$2$3)
   });
-  qual$4.addEventListener("change", x$11);
+  qual$4.addEventListener("click", x$11);
   var qual$5 = this.cttArea$1;
   var x$14 = (function(arg1$2$4) {
     $m_Lmain_scala_CttEditor$();
     $m_Lmain_scala_CttEditor$().cttChanged__Lorg_scalajs_dom_raw_Event__V(arg1$2$4)
   });
-  qual$5.addEventListener("keyup", x$14);
-  var qual$6 = this.cttNormalize$1;
+  qual$5.addEventListener("change", x$14);
+  var qual$6 = this.cttArea$1;
   var x$17 = (function(arg1$2$5) {
     $m_Lmain_scala_CttEditor$();
     $m_Lmain_scala_CttEditor$().cttChanged__Lorg_scalajs_dom_raw_Event__V(arg1$2$5)
   });
-  qual$6.addEventListener("change", x$17);
-  var qual$7 = this.cttFiles$1;
+  qual$6.addEventListener("keyup", x$17);
+  var qual$7 = this.cttNormalize$1;
   var x$20 = (function(arg1$2$6) {
     $m_Lmain_scala_CttEditor$();
-    $m_Lmain_scala_CttEditor$().selectedFileChanged__p1__Lorg_scalajs_dom_raw_Event__V(arg1$2$6)
+    $m_Lmain_scala_CttEditor$().cttChanged__Lorg_scalajs_dom_raw_Event__V(arg1$2$6)
   });
   qual$7.addEventListener("change", x$20);
+  var qual$8 = this.cttFiles$1;
+  var x$23 = (function(arg1$2$7) {
+    $m_Lmain_scala_CttEditor$();
+    $m_Lmain_scala_CttEditor$().selectedFileChanged__p1__Lorg_scalajs_dom_raw_Event__V(arg1$2$7)
+  });
+  qual$8.addEventListener("change", x$23);
   this.loadFileList__p1__V();
   this.cttFiles$1.selectedIndex = 0;
   this.selectedFileChanged__p1__Lorg_scalajs_dom_raw_Event__V(null)
@@ -3866,6 +3883,15 @@ $c_Lmain_scala_CttEditor$.prototype.loadFileList__p1__V = (function() {
   }));
   oReq.open("GET", "../ctt-editor-files/", false);
   oReq.send()
+});
+$c_Lmain_scala_CttEditor$.prototype.download__T__T__V = (function(filename, text) {
+  var element = $m_Lorg_scalajs_dom_package$().document__Lorg_scalajs_dom_raw_HTMLDocument().createElement("a");
+  element.setAttribute("href", ("data:image/svg+xml;charset=utf-8," + $as_T($g.encodeURIComponent(text))));
+  element.setAttribute("download", filename);
+  element.style.display = "none";
+  $m_Lorg_scalajs_dom_package$().document__Lorg_scalajs_dom_raw_HTMLDocument().body.appendChild(element);
+  element.click();
+  $m_Lorg_scalajs_dom_package$().document__Lorg_scalajs_dom_raw_HTMLDocument().body.removeChild(element)
 });
 $c_Lmain_scala_CttEditor$.prototype.appendPar__Lorg_scalajs_dom_raw_Node__T__V = (function(targetNode, text) {
   var parNode = $m_Lorg_scalajs_dom_package$().document__Lorg_scalajs_dom_raw_HTMLDocument().createElement("p");
@@ -4297,6 +4323,13 @@ $c_Lmain_scala_StaticUtil$.prototype.ctt$undcode$undto$undsvg__Lmain_scala_CttNo
 $c_Lmain_scala_StaticUtil$.prototype.init___ = (function() {
   return this
 });
+$c_Lmain_scala_StaticUtil$.prototype.escapeXml__T__T = (function(unsafe) {
+  var thiz = $as_T(unsafe.split("&").join("&amp;"));
+  var thiz$1 = $as_T(thiz.split("<").join("&lt;"));
+  var thiz$2 = $as_T(thiz$1.split(">").join("&gt;"));
+  var thiz$3 = $as_T(thiz$2.split("'").join("&apos;"));
+  return $as_T(thiz$3.split("\"").join("&quot;"))
+});
 $c_Lmain_scala_StaticUtil$.prototype.count$undleading$undtabs__T__I = (function(str) {
   var nonLocalReturnKey1 = new $c_O().init___();
   try {
@@ -4354,7 +4387,7 @@ $c_Lmain_scala_StaticUtil$.prototype.render$undctt$undto$undsvg__Lmain_scala_Ctt
   lowest_y.elem$1 = (41 + lowest_y.elem$1);
   var sb = new $c_scm_StringBuilder().init___();
   sb.append__T__scm_StringBuilder("<?xml version='1.0' encoding='UTF-8' ?>\n");
-  sb.append__T__scm_StringBuilder((((("<svg width='" + (32 + node.width$1)) + "' height='") + lowest_y.elem$1) + "' xmlns='http://www.w3.org/2000/svg' version='1.1'>\n"));
+  sb.append__T__scm_StringBuilder((((("<svg width='" + (32 + node.width$1)) + "' height='") + lowest_y.elem$1) + "' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' version='1.1'>\n"));
   this.render$undrecurse$undlines$1__p1__Lmain_scala_CttNode__scm_StringBuilder__V(node, sb);
   this.render$undrecurse$1__p1__Lmain_scala_CttNode__scm_StringBuilder__V(node, sb);
   sb.append__T__scm_StringBuilder("</svg>\n");
@@ -5491,11 +5524,11 @@ $c_Lmain_scala_StaticUtil$.prototype.render$undrecurse$undlines$1__p1__Lmain_sca
     var arg1 = these.head__O();
     var child = $as_Lmain_scala_CttNode(arg1);
     if (($as_Lmain_scala_CttNode(elem$1) !== null)) {
-      sb$2.append__T__scm_StringBuilder((((((((("<line x1='" + (17 + $as_Lmain_scala_CttNode(elem$1).pos$1.x$1)) + "' y1='") + (0.5 + $as_Lmain_scala_CttNode(elem$1).pos$1.y$1)) + "' x2='") + ((-17.0) + child.pos$1.x$1)) + "' y2='") + (0.5 + $as_Lmain_scala_CttNode(elem$1).pos$1.y$1)) + "' style='stroke-width: 1; stroke: rgb(10, 10, 10);'></line>\n"))
+      sb$2.append__T__scm_StringBuilder((((((((("<line x1='" + (17 + $as_Lmain_scala_CttNode(elem$1).pos$1.x$1)) + "' y1='") + (0.5 + $as_Lmain_scala_CttNode(elem$1).pos$1.y$1)) + "' x2='") + ((-17.0) + child.pos$1.x$1)) + "' y2='") + (0.5 + $as_Lmain_scala_CttNode(elem$1).pos$1.y$1)) + "' style='stroke-width: 1; stroke:#0a0a0a'></line>\n"))
     };
     var icon = child.GetIconName__T();
     if ((!$m_Lmain_scala_StaticUtil$().isEmpty__T__Z(icon))) {
-      sb$2.append__T__scm_StringBuilder((((((((("<line x1='" + n.pos$1.x$1) + "' y1='") + (16 + n.pos$1.y$1)) + "' x2='") + child.pos$1.x$1) + "' y2='") + ((-16.0) + child.pos$1.y$1)) + "' style='stroke-width: 1; stroke: rgba(10, 10, 10, 200);'></line>\n"))
+      sb$2.append__T__scm_StringBuilder((((((((("<line x1='" + n.pos$1.x$1) + "' y1='") + (16 + n.pos$1.y$1)) + "' x2='") + child.pos$1.x$1) + "' y2='") + ((-16.0) + child.pos$1.y$1)) + "' style='stroke-width: 1; stroke:#0a0a0a; fill-opacity:0.7;'></line>\n"))
     };
     this.render$undrecurse$undlines$1__p1__Lmain_scala_CttNode__scm_StringBuilder__V(child, sb$2);
     elem$1 = child;
@@ -5523,19 +5556,22 @@ $c_Lmain_scala_StaticUtil$.prototype.render$undrecurse$1__p1__Lmain_scala_CttNod
   if ((icon === "")) {
     text_y = (4 + n.pos$1.y$1);
     bg_y = ((-7.0) + n.pos$1.y$1);
-    sb$2.append__T__scm_StringBuilder((((("<rect x='" + ((-16.0) + n.pos$1.x$1)) + "' y='") + ((-16.0) + n.pos$1.y$1)) + "' width='32' height='32' style='fill: #FFFFFF;'></rect>\n"))
+    sb$2.append__T__scm_StringBuilder((((("<rect x='" + ((-16.0) + n.pos$1.x$1)) + "' y='") + ((-16.0) + n.pos$1.y$1)) + "' width='32' height='32' style='fill:#FFFFFF; fill-opacity:0.7;'></rect>\n"))
   } else {
     text_y = (26 + n.pos$1.y$1);
     bg_y = (15.0 + n.pos$1.y$1);
-    sb$2.append__T__scm_StringBuilder((((((("<image x='" + ((-16.0) + n.pos$1.x$1)) + "' y='") + ((-16.0) + n.pos$1.y$1)) + "' width='32' height='32' href='") + icon) + "' visibility='visible'></image>\n"))
+    sb$2.append__T__scm_StringBuilder((((((("<image x='" + ((-16.0) + n.pos$1.x$1)) + "' y='") + ((-16.0) + n.pos$1.y$1)) + "' width='32' height='32' xlink:href='") + icon) + "' visibility='visible'></image>\n"))
   };
   var nam = n.displayName__T();
-  var w = (7.2 * $uI(nam.length));
-  sb$2.append__T__scm_StringBuilder((((((("<rect x='" + (n.pos$1.x$1 - $imul(3, $uI(nam.length)))) + "' y='") + bg_y) + "' width='") + w) + "' height='15' style='fill: rgba(255, 255, 255, 0.7);'></rect>\n"));
-  sb$2.append__T__scm_StringBuilder((((((((("<text x='" + (n.pos$1.x$1 - $imul(3, $uI(nam.length)))) + "' y='") + text_y) + "' width='") + w) + "' height='15' style='font-family: monospace;'>") + nam) + "</text>\n"));
-  var this$4 = n.children$1;
-  var this$5 = this$4.scala$collection$mutable$ListBuffer$$start$6;
-  var these = this$5;
+  var thiz = nam;
+  var nam_len = $uI(thiz.length);
+  var w = (7.2 * nam_len);
+  nam = this.escapeXml__T__T(nam);
+  sb$2.append__T__scm_StringBuilder((((((("<rect x='" + (n.pos$1.x$1 - $imul(3, nam_len))) + "' y='") + bg_y) + "' width='") + w) + "' height='15' style='fill:#FFFFFF; fill-opacity:0.7;'></rect>\n"));
+  sb$2.append__T__scm_StringBuilder((((((((("<text x='" + (n.pos$1.x$1 - $imul(3, nam_len))) + "' y='") + text_y) + "' width='") + w) + "' height='15' style='font-family: monospace;'>") + nam) + "</text>\n"));
+  var this$2 = n.children$1;
+  var this$3 = this$2.scala$collection$mutable$ListBuffer$$start$6;
+  var these = this$3;
   while ((!these.isEmpty__Z())) {
     var arg1 = these.head__O();
     var child = $as_Lmain_scala_CttNode(arg1);
