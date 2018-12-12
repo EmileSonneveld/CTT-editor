@@ -90,6 +90,7 @@ object CttEditor {
       cttMake.removeAttribute("hidden")
   }
 
+
   private def makeNewCtt(evt: Event): Unit = {
     var newCttName = cttFilter.value
     if (!newCttName.endsWith(".txt"))
@@ -97,7 +98,6 @@ object CttEditor {
 
     {
       val oReq = new XMLHttpRequest()
-      //oReq.addEventListener("load", fileUploaded)
       oReq.open("POST", "../ctt-editor-files/" + newCttName, async = false)
       oReq.setRequestHeader("file_content", URIUtils.encodeURI("")) // empty file
       oReq.send()
@@ -114,10 +114,14 @@ object CttEditor {
     oReq.send()
   }
 
+  var wantToUpladCtt = false
+  var cttUploadingInProccess = false
+
   def cttChanged(evt: Event): Unit = {
     try {
       cttMessage.innerHTML = ""
 
+      // Set UI state
       val ctt_code = cttArea.value
       val ctt = StaticUtil.linear_parse_ctt(ctt_code)
       if (cttNormalize.checked)
@@ -127,14 +131,9 @@ object CttEditor {
         StaticUtil.normalise_ctt(ctt)
       cttEts.innerHTML = StaticUtil.ctt_to_enabled_task_sets(ctt).toString.replace("\n", "<br/>\n")
 
-      val oReq = new XMLHttpRequest()
-      oReq.addEventListener("load", fileUploaded)
-      oReq.addEventListener("error", fileUploadFailed);
-      oReq.open("POST", "../ctt-editor-files/" + cttFiles.value) //, async = false)
-      oReq.setRequestHeader("file_content", URIUtils.encodeURI(ctt_code))
-      oReq.send()
 
-      println("cttChanged and was valid")
+      wantToUpladCtt = true
+      cttUploadingBeatingHearth()
     } catch {
       case (e: Throwable) => {
         cttMessage.innerHTML = e.getMessage
@@ -142,8 +141,52 @@ object CttEditor {
     }
   }
 
-  def fileUploaded(evt: Event) = {
+  def cttUploadingBeatingHearth() = {
+    if (wantToUpladCtt) {
+      if (cttUploadingInProccess) {
+        // Wait to next 'hearthbeat'
+      } else {
+        try {
+          cttMessage.innerHTML = ""
+
+          // Set UI state
+          val ctt_code = cttArea.value
+          val ctt = StaticUtil.linear_parse_ctt(ctt_code)
+          if (cttNormalize.checked)
+            StaticUtil.normalise_ctt(ctt)
+          cttHolder.innerHTML = StaticUtil.ctt_code_to_svg(ctt)
+          if (!cttNormalize.checked)
+            StaticUtil.normalise_ctt(ctt)
+          cttEts.innerHTML = StaticUtil.ctt_to_enabled_task_sets(ctt).toString.replace("\n", "<br/>\n")
+
+
+          val oReq = new XMLHttpRequest()
+          oReq.addEventListener("load", fileUploadedSucces)
+          oReq.addEventListener("error", fileUploadFailed)
+          oReq.open("POST", "../ctt-editor-files/" + cttFiles.value) //, async = false)
+          oReq.setRequestHeader("file_content", URIUtils.encodeURI(ctt_code))
+          oReq.send()
+          cttUploadingInProccess = true
+
+          wantToUpladCtt = false
+          println("cttChanged and was valid")
+        } catch {
+          case (e: Throwable) => {
+            cttMessage.innerHTML = e.getMessage
+          }
+        }
+      }
+    }
+  }
+
+  def fileUploaded_delayed():Unit = {
+    cttUploadingInProccess = false
+    cttUploadingBeatingHearth()
+  }
+
+  def fileUploadedSucces(evt: Event) = {
     cttMessage.innerHTML = ""
+    dom.window.setTimeout(() => fileUploaded_delayed(), 500) // Short delay to ba safe on slower backends
   }
 
   def fileUploadFailed(evt: Event) = {
@@ -151,6 +194,7 @@ object CttEditor {
       cttMessage.innerHTML = "CTT upload failed. <br/>This app should be accesed trough a webserver, not as a plain HTML-file."
     else
       cttMessage.innerHTML = "CTT upload failed. <br/>Submit issue here: https://github.com/EmileSonneveld/CTT-editor"
+    dom.window.setTimeout(() => fileUploaded_delayed(), 500) // Short delay to ba safe on slower backends
   }
 
 

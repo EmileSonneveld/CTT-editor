@@ -24,3 +24,4 @@ libraryDependencies += "org.scalafx" %% "scalafx" % "8.0.144-R12"
 
 // https://mvnrepository.com/artifact/com.typesafe.play/play-json
 libraryDependencies += "com.typesafe.play" %%% "play-json" % "2.7.0-RC2"
+

@@ -1,0 +1,27 @@
+AccesATM https://www.researchgate.net/figure/Example-of-task-model-in-ConcurTaskTrees_fig1_2413967
+	EnableAccess
+		InserCard
+		>>
+		RequirePassword
+		>>
+		InsertPassword
+	>>
+	Access*
+		WithdrawCash
+			SelectWithdrawn
+			>>
+			ShowPossibleAmounts
+			[]>>
+			DecideAmount user
+			[]>>
+			SelectAmount
+			[]>>
+			ProvideCash
+			[]>>
+			Checkcash
+		[]
+		DepositCash
+		[]
+		GetInformation
+	[>
+	CloseAccess

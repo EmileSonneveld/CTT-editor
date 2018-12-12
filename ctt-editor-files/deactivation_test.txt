@@ -1,11 +1,11 @@
 deactivation_test
-	A
+	A user
 	>>
 	B
 	[>
-	C
+	C application
 	>>
 	D
-		lol
+		E
 		[>
-		lolz
+		F abstraction

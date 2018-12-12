@@ -32,6 +32,15 @@ class CttNode {
   var width: Double = -1 // not calculated yet
   var parent: CttNode = _
 
+  val icons = List("abstraction", "application", "interaction", "user")
+
+  def displayName(): String = {
+    val sp = name.split(' ')
+    if (icons.contains(sp.last))
+      return name.substring(0, name.length - sp.last.length - 1)
+    return name
+  }
+
   def addChild(child: CttNode, index: Int = -1) = {
     child.parent = this
     var idx = index
@@ -79,6 +88,9 @@ class CttNode {
   }
 
   def GetIconName(): String = {
+    val sp = name.split(' ')
+    if (icons.contains(sp.last)) return sp.last + ".gif"
+
     if (children.size > 0) return "abstraction.gif"
     val n = name.toLowerCase()
     if (Operator() != null) return ""
@@ -90,6 +102,6 @@ class CttNode {
   }
 
   override def toString = {
-    name
+    displayName()
   }
 }

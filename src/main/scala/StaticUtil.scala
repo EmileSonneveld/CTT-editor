@@ -47,7 +47,7 @@ object StaticUtil {
               n.children.remove(i)
               n.children.remove(i - 1)
 
-              newNode.name = "(" + left.name + " & " + right.name + ")"
+              newNode.name = "(" + left.displayName + " & " + right.displayName + ")"
               newNode.addChild(left)
               newNode.addChild(child)
               newNode.addChild(right)
@@ -285,10 +285,10 @@ object StaticUtil {
         bg_y = (n.pos.y + 26 - 11)
         sb.append("<image x='" + (n.pos.x - 16) + "' y='" + (n.pos.y - 16) + "' width='32' height='32' href='" + icon + "' visibility='visible'></image>\n")
       }
-
-      val w = (n.name.length * 7.2)
-      sb.append("<rect x='" + (n.pos.x - n.name.length * 3) + "' y='" + bg_y + "' width='" + w + "' height='15' style='fill: rgba(255, 255, 255, 0.7);'></rect>\n")
-      sb.append("<text x='" + (n.pos.x - n.name.length * 3) + "' y='" + text_y + "' width='" + w + "' height='15' style='font-family: monospace;'>" + n.name + "</text>\n")
+      val nam = n.displayName()
+      val w = (nam.length * 7.2)
+      sb.append("<rect x='" + (n.pos.x - nam.length * 3) + "' y='" + bg_y + "' width='" + w + "' height='15' style='fill: rgba(255, 255, 255, 0.7);'></rect>\n")
+      sb.append("<text x='" + (n.pos.x - nam.length * 3) + "' y='" + text_y + "' width='" + w + "' height='15' style='font-family: monospace;'>" + nam + "</text>\n")
 
 
       for (child <- n.children) {

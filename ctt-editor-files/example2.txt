@@ -1,0 +1,15 @@
+Handle Agenda
+	Make Appointment*
+		DefineDate
+			ShowCalendar*
+			|[]|
+			EnterDate
+				EnterDay
+				|||
+				EnterMonth
+				|||
+				EnterYear
+		[>
+		EnterAppointmentTopic
+	[>
+	Close

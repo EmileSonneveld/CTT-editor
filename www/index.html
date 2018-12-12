@@ -1,20 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title></title>
+	<title>CTT-editor</title>
     <link rel="icon" href="data:;base64,iVBORw0KGgo="> <!-- Don't request favicon -->
 	<style type="text/css">
-/*select {
-	
-	min-height: 45px;
-	max-height: 100%
-	border-width: 3px;
-	border-color: rgba(50, 50, 50, 0.14);
-	margin: 10px 10px 10px 0px;
-}*/
+
 html, body {
 	height: 100%;
 	margin: 0;
+}
+
+.gui-screen {
+    margin: 5px;
+    padding: 5px;
+    background: lightcyan;
 }
 	</style>
 </head>
@@ -24,7 +23,7 @@ html, body {
 -->
 <div style="display:flex; flex-direction:column; height: 100%;">
 
-	<div style="display:flex; flex-direction:row; height: 400px; resize:vertical; overflow:auto;">
+	<div style="display:flex; flex-direction:row; height: 600px; resize:vertical; overflow:auto;">
 		<div style="display:flex; flex-direction:column;min-width: 300px; margin:5px">
 			<input type="text" id="ctt-filter" style="border-radius: 5px 5px 0px 0px; padding: 2px;">
 			<button id="ctt-make">Make new CTT</button>
@@ -33,8 +32,8 @@ html, body {
 			</select>
             <div><input type="checkbox" id="ctt-normlize"></input>Draw normailzed CTT</div>
 		</div>
-        <div style="display:flex; flex-direction:column;min-width: 300px; margin:5px">
-		  <textarea id="ctt-texarea" style="width: 100%; min-width: 200px; height: 100%; tab-size: 2; background: antiquewhite; resize:none;">
+        <div style="display:flex; flex-direction:column; min-width: 400px; margin:5px">
+		  <textarea id="ctt-texarea" style="height: 100%; tab-size: 2; background: antiquewhite; resize:none;">
 example
 	branch_a
 	||
@@ -46,11 +45,39 @@ example
             {enabled task set should appear here}<br/>
             {enabled task set 2}<br/>
         </div>
+        <!-- UI test
+        <div id="ctt-gui" style="width: 100%; min-width: 200px;">
+            <div class="gui-screen">
+                <button style="display: block">Open File</button>
+                <button style="display: block">Select Print</button>
+                <button style="display: block">Deleting</button>
+                <button style="display: block">Close</button>
+            </div>
+            <div class="gui-screen">
+                <button style="display: block">Insert</button>
+                <button style="display: block">Cut</button>
+                <button style="display: block">Scroll</button>
+                <button style="display: block">Close</button>
+            </div>
+            <div class="gui-screen">
+                <button style="display: block">Select printer</button>
+                <button style="display: block">Close</button>
+            </div>
+            <div class="gui-screen">
+                <button style="display: block">Select pages</button>
+                <button style="display: block">Close</button>
+            </div>
+            <div class="gui-screen">
+                <div style="display: block"><img src="application.gif" style="height: 35px;">Print</div>
+                <button style="display: block">Close</button>
+            </div>
+        </div>
+    -->
 	</div>
 	<div id="ctt-holder" style="height: 100%; overflow: scroll;">(CTT-SVG should appear here)</div>
 </div>
 
-<script src="../target/scala-2.12/ctt-editor-fastopt.js"></script>
+<script src="ctt-editor-fastopt.js"></script>
 
 
 <!--
