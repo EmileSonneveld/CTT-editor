@@ -51,7 +51,7 @@ object CttEditor {
     selectedFileChanged(null)
   }
 
-  def download(filename:String, text:String) {
+  def download(filename: String, text: String) {
     var element = document.createElement("a").asInstanceOf[HTMLLinkElement]
     element.setAttribute("href", "data:image/svg+xml;charset=utf-8," + URIUtils.encodeURIComponent(text))
     element.setAttribute("download", filename)
@@ -61,7 +61,7 @@ object CttEditor {
     document.body.removeChild(element)
   }
 
-  private def cttSvgDownloadClicked(evt:Event) = {
+  private def cttSvgDownloadClicked(evt: Event) = {
     val newCttName = cttFiles.value + ".svg"
     val ctt = StaticUtil.linear_parse_ctt(this.cttArea.value)
     if (cttNormalize.checked)
@@ -119,10 +119,11 @@ object CttEditor {
       newCttName += ".txt"
 
     {
+      val emptyCtt = ""
       val oReq = new XMLHttpRequest()
       oReq.open("POST", "../ctt-editor-files/" + newCttName, async = false)
-      oReq.setRequestHeader("file_content", URIUtils.encodeURI("")) // empty file
-      oReq.send()
+      oReq.setRequestHeader("file_content", URIUtils.encodeURI(emptyCtt)) // empty file
+      oReq.send(emptyCtt)
     }
     loadFileList()
     cttFiles.value = newCttName
@@ -132,16 +133,18 @@ object CttEditor {
   private def selectedFileChanged(evt: Event): Unit = {
     val oReq = new XMLHttpRequest()
     oReq.addEventListener("load", gotNewFileContent)
-    oReq.open("GET", "../ctt-editor-files/" + cttFiles.value) //, async = false)
+    oReq.open("GET", "../ctt-editor-files/" + cttFiles.value, async = false)
     oReq.send()
   }
 
   var wantToUpladCtt = false
   var cttUploadingInProccess = false
+  var cttHandlingError: String = ""
 
   def cttChanged(evt: Event): Unit = {
     try {
-      cttMessage.innerHTML = ""
+      cttHandlingError = ""
+      ApplyErrorMessage()
 
       // Set UI state
       val ctt_code = cttArea.value
@@ -158,10 +161,17 @@ object CttEditor {
       cttUploadingBeatingHearth()
     } catch {
       case (e: Throwable) => {
-        cttMessage.innerHTML = e.getMessage
+        cttHandlingError = e.getMessage
+        ApplyErrorMessage()
       }
     }
   }
+
+  def ApplyErrorMessage(): Unit = {
+    cttMessage.innerHTML = cttHandlingError + uploadError
+  }
+
+  var uploadError = ""
 
   def cttUploadingBeatingHearth() = {
     if (wantToUpladCtt) {
@@ -169,7 +179,8 @@ object CttEditor {
         // Wait to next 'hearthbeat'
       } else {
         try {
-          cttMessage.innerHTML = ""
+          uploadError = ""
+          ApplyErrorMessage()
 
           // Set UI state
           val ctt_code = cttArea.value
@@ -183,8 +194,19 @@ object CttEditor {
 
 
           val oReq = new XMLHttpRequest()
-          oReq.addEventListener("load", fileUploadedSucces)
-          oReq.addEventListener("error", fileUploadFailed)
+          oReq.addEventListener("error", fileUploadInterenetFailed)
+          oReq.onreadystatechange = { (e: dom.Event) => {
+            if (oReq.readyState == 4) {
+              if (oReq.status >= 500) {
+                uploadError = "Problem status: " + oReq.status + " responseText: " + oReq.responseText
+              } else {
+                uploadError = ""
+              }
+              ApplyErrorMessage()
+              dom.window.setTimeout(() => fileUploaded_delayed(), 500) // Short delay to ba safe on slower backends
+            }
+          }
+          }
           oReq.open("POST", "../ctt-editor-files/" + cttFiles.value) //, async = false)
           oReq.setRequestHeader("file_content", URIUtils.encodeURI(ctt_code))
           oReq.send(ctt_code)
@@ -194,31 +216,24 @@ object CttEditor {
           println("cttChanged and was valid")
         } catch {
           case (e: Throwable) => {
-            cttMessage.innerHTML = e.getMessage
+            uploadError = e.getMessage
+            ApplyErrorMessage()
           }
         }
       }
     }
   }
 
-  def fileUploaded_delayed():Unit = {
+  def fileUploaded_delayed(): Unit = {
     cttUploadingInProccess = false
     cttUploadingBeatingHearth()
   }
 
-  def fileUploadedSucces(evt: Event) = {
-    cttMessage.innerHTML = ""
+  def fileUploadInterenetFailed(evt: Event) = {
+    uploadError = "Internet connection problem."
+    ApplyErrorMessage()
     dom.window.setTimeout(() => fileUploaded_delayed(), 500) // Short delay to ba safe on slower backends
   }
-
-  def fileUploadFailed(evt: Event) = {
-    if (dom.window.location.protocol == "file:")
-      cttMessage.innerHTML = "CTT upload failed. <br/>This app should be accesed trough a webserver, not as a plain HTML-file."
-    else
-      cttMessage.innerHTML = "CTT upload failed. <br/>Submit issue here: https://github.com/EmileSonneveld/CTT-editor"
-    dom.window.setTimeout(() => fileUploaded_delayed(), 500) // Short delay to ba safe on slower backends
-  }
-
 
   def gotNewFileContent(evt: Event): Unit = {
     val ctt_code = evt.target.asInstanceOf[XMLHttpRequest].responseText

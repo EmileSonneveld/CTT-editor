@@ -33,7 +33,6 @@ object StaticUtil {
   }
 
   def normalise_ctt(ctt: CttNode): Unit = {
-    println("normalise_ctt")
 
     def rec(n: CttNode): Unit = {
 
@@ -45,7 +44,7 @@ object StaticUtil {
           while (i < n.children.length) {
             val child = n.children(i)
             val op = child.Operator()
-            assert(op != null)
+            assert(op != null, "Missing operator somewhere?")
 
             if (op.priority == prio) {
               didSomething = true
@@ -87,11 +86,9 @@ object StaticUtil {
       val etss_len = etss.sets.length // Don't loop over the new ETSes
       for (i <- 0 until etss_len) {
         val ets = etss.sets(i)
-        println("Enabled task set")
         var j = 0
         while (j < ets.tasks.length) {
           val task = ets.tasks(j)
-          println("  task: " + task + "  j: " + j)
 
           if (task.children.length > 0) {
             ets.tasks.remove(j)
@@ -143,7 +140,7 @@ object StaticUtil {
     }
 
     // Todo: Know when to stop with the loop
-    for(i<- 0 until 200) {
+    for(_ <- 0 until 100) {
       level_pass()
     }
     return etss
@@ -188,7 +185,7 @@ object StaticUtil {
         } else if (leading_tabs < indentLevel) {
           shrink_stack(stack, leading_tabs + 1)
         } else {
-          throw new Exception("Something went wrong")
+          throw new Exception("Something went wrong with the indentation.")
         }
 
         indentLevel = leading_tabs
@@ -207,7 +204,7 @@ object StaticUtil {
 
   def shrink_stack(stack: Stack[CttNode], size: Int): Unit = {
     var stackSize = stack.size
-    assert(stackSize >= size)
+    assert(stackSize >= size, "Some indentation might be wrong")
     for (_ <- 0 until stack.size - size) {
       stack.pop()
     }
