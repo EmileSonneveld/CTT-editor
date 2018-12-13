@@ -120,7 +120,7 @@ object StaticUtil {
                     val ets_new = new EnabledTaskSet()
                     ets_new.tasks += child
 
-                    val desactivationTasks = child.findDesactivationTaskRightUp()
+                    val desactivationTasks = child.findTaskRightUp()
                     for (t <- desactivationTasks)
                       ets_new.tasks += t
 

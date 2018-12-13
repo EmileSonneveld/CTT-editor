@@ -37,6 +37,7 @@ Some things I learned:
 - Sync requests don't seem that bad when the site is always loading on localhost. A request takes ~ 10ms.
 - The backend (CrudServer) is very simple backend that gives the user all file permissions in the folder where it operates.
 For applications running locally, this isn't a security problem. For online applications, this should only be used in small teams with people you trust.
+- Inkscape has some problems with displaying SVGs while browsers mostly handle everything.
 
 
 Building

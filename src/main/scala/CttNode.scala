@@ -49,8 +49,7 @@ class CttNode {
     this.children.insert(idx, child)
   }
 
-  def findDesactivationTaskRightUp(): ListBuffer[CttNode] = {
-
+  def findTaskRightUp(): ListBuffer[CttNode] = {
     var retList = ListBuffer[CttNode]()
     def rec(n: CttNode): CttNode = {
       if (n.parent == null) return null
