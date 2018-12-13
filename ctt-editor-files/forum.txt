@@ -25,13 +25,16 @@ Forum
 			[]
 			Answer or comment
 				Select answer or comment
+					Select answer
+					[]
+					Select comment
 				[]>>
 				Enter response
 				[]>>
 				[post]
 					save
 					[]>>
-					Show Application
+					Show application
 		[>
 		Stop category
 	[>

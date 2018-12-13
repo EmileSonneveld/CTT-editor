@@ -187,7 +187,7 @@ object CttEditor {
           oReq.addEventListener("error", fileUploadFailed)
           oReq.open("POST", "../ctt-editor-files/" + cttFiles.value) //, async = false)
           oReq.setRequestHeader("file_content", URIUtils.encodeURI(ctt_code))
-          oReq.send()
+          oReq.send(ctt_code)
           cttUploadingInProccess = true
 
           wantToUpladCtt = false

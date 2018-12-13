@@ -101,28 +101,37 @@ object StaticUtil {
               if (child.Operator() != null)
                 lastOperator = child.Operator().name
               else {
-                if (lastOperator == "" // Still the first element / head. This is always added
-                  || lastOperator == "[]"
-                  || lastOperator == "|=|"
-                  || lastOperator == "||"
-                  || lastOperator == "|||"
-                  || lastOperator == "|[]|"
-                  || lastOperator == "[>" // Todo: Investigate further
-                  || lastOperator == "|>" // Todo: Investigate further
-                ) {
-                  ets.tasks.insert(j, child)
-                  j += 1
-                } else if (lastOperator == ">>"
-                  || lastOperator == "[]>>"
-                ) {
-                  val ets_new = new EnabledTaskSet()
-                  ets_new.tasks += child
+                if (child.GetIconName() != "user.gif"
+                  //|| child.GetIconName() == "abstraction.gif"
+                  //|| child.name.toLowerCase().startsWith("show") // Todo: How to know when to show an application task or not?
+                )
+                {
+                  if (lastOperator == "" // Still the first element / head. This is always added
+                    || lastOperator == "[]"
+                    || lastOperator == "|=|"
+                    || lastOperator == "||"
+                    || lastOperator == "|||"
+                    || lastOperator == "|[]|"
+                    || lastOperator == "[>" // Todo: Investigate further
+                    || lastOperator == "|>" // Todo: Investigate further
+                  ) {
+                    ets.tasks.insert(j, child)
+                    j += 1
+                  } else if (lastOperator == ">>"
+                    || lastOperator == "[]>>"
+                  ) {
+                    val ets_new = new EnabledTaskSet()
+                    ets_new.tasks += child
 
-                  val desactivationTask = child.findDesactivationTaskRightUp()
-                  if (desactivationTask != null)
-                    ets_new.tasks += desactivationTask
+                    val desactivationTasks = child.findDesactivationTaskRightUp()
+                    for (t <- desactivationTasks)
+                      ets_new.tasks += t
 
-                  etss.sets += ets_new
+                    //if (desactivationTask != null)
+                    //  ets_new.tasks += desactivationTask
+
+                    etss.sets += ets_new
+                  }
                 }
               }
             }
@@ -133,22 +142,10 @@ object StaticUtil {
       }
     }
 
-    // Todo: put in a loop obviously...
-    level_pass()
-    level_pass()
-    level_pass()
-    level_pass()
-    level_pass()
-    level_pass()
-    level_pass()
-    level_pass()
-    level_pass()
-    level_pass()
-    level_pass()
-    level_pass()
-    level_pass()
-    level_pass()
-    level_pass()
+    // Todo: Know when to stop with the loop
+    for(i<- 0 until 200) {
+      level_pass()
+    }
     return etss
   }
 

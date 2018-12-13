@@ -49,8 +49,9 @@ class CttNode {
     this.children.insert(idx, child)
   }
 
-  def findDesactivationTaskRightUp(): CttNode = {
+  def findDesactivationTaskRightUp(): ListBuffer[CttNode] = {
 
+    var retList = ListBuffer[CttNode]()
     def rec(n: CttNode): CttNode = {
       if (n.parent == null) return null
 
@@ -59,7 +60,8 @@ class CttNode {
       for (sibling <- n.parent.children) {
         if (passedSelf) {
           if (passedDisabelingTask) {
-            return sibling
+            retList += sibling
+            //return sibling
           } else {
             val op = sibling.Operator()
             if (op != null && op.name == "[>") passedDisabelingTask = true
@@ -71,7 +73,8 @@ class CttNode {
       return rec(n.parent)
     }
 
-    return rec(this)
+    rec(this)
+    return retList
   }
 
   def minimumWidth(): Double = {
