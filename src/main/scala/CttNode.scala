@@ -49,27 +49,49 @@ class CttNode {
     this.children.insert(idx, child)
   }
 
-  def findTaskRightUp(): ListBuffer[CttNode] = {
+  def findTaskLeftUp(): ListBuffer[CttNode] = {
     var retList = ListBuffer[CttNode]()
-    def rec(n: CttNode): CttNode = {
-      if (n.parent == null) return null
 
-      var passedSelf = false // This mechanism could probably be simpler if we depend on propper CTT-normalisation
-      var passedDisabelingTask = false
-      for (sibling <- n.parent.children) {
-        if (passedSelf) {
-          if (passedDisabelingTask) {
-            retList += sibling
-            //return sibling
-          } else {
-            val op = sibling.Operator()
-            if (op != null && op.name == "[>") passedDisabelingTask = true
-          }
-        } else {
-          if (sibling == n) passedSelf = true
+    def rec(n: CttNode): Unit = {
+      if (n.parent == null) return
+
+      val siblings = n.parent.children
+      if (siblings.length == 3) {
+        rec(n.parent)
+        if (siblings(2) == n) // We should come from the left side
+        {
+          val op = siblings(1) // middle
+          assert(op != null, "Middle node should be operator.")
+          if (op.name == "|||" || op.name == "|[]|") // op.name == "[>" ||
+            retList += siblings(0) // left one
         }
       }
-      return rec(n.parent)
+    }
+
+    //rec(this)
+    return retList
+  }
+
+  def findTaskRightUp(): ListBuffer[CttNode] = {
+    var retList = ListBuffer[CttNode]()
+
+    def rec(n: CttNode): Unit = {
+      if (n.parent == null) return
+
+      val siblings = n.parent.children
+      if (siblings.length == 1)
+        rec(n.parent) // uninteresting layer, let's move on
+      else if (siblings.length == 3) {
+        if (siblings(0) == n) // We should come from the left side
+        {
+          val op = siblings(1) // middle
+          assert(op != null, "Middle node should be operator.")
+          if (op.name == "[>" || op.name == "|||" || op.name == "|[]|")
+            retList += siblings(2) // right one
+          rec(n.parent)
+        }
+      }
+      else throw new Exception("Problem with number of children.")
     }
 
     rec(this)
