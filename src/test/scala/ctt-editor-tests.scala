@@ -81,4 +81,22 @@ class CttEditorTest extends FunSuite {
     println(StaticUtil.print_ctt(ctt))
   }
 
+  test("forumETS") {
+
+    val fileContents = Source.fromFile("ctt-editor-files/forum.txt").getLines.mkString("\n")
+    val ctt = StaticUtil.linear_parse_ctt(fileContents)
+    //println(StaticUtil.print_ctt(ctt))
+
+    StaticUtil.normalise_ctt(ctt)
+    var etss = StaticUtil.ctt_to_enabled_task_sets(ctt)
+    val etssStr = etss.toString
+
+    var shouldLookLikeThis = """{Show categories, select category, submit category, Quit}
+      |{Show content category, Enter title, Enter content, Submit, select answer, Select comment ,Stop category, Quit}
+      |{Show content category, Post on Forum, Stop category, Quit}
+      |{Show content category, Enter response, Stop category, Quit}
+      |{Show content category, save, Stop category, Quit}
+      |{Show content category, Show, Stop category, Quit}"""
+    println(etss)
+  }
 }

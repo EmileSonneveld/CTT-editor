@@ -56,19 +56,23 @@ class CttNode {
       if (n.parent == null) return
 
       val siblings = n.parent.children
-      if (siblings.length == 3) {
-        rec(n.parent)
-        if (siblings(2) == n) // We should come from the left side
+      if (siblings.length == 1)
+        rec(n.parent) // uninteresting layer, let's move on
+      else if (siblings.length == 3) {
+        rec(n.parent) // get reversed list by first doing the recursive call
+        val op = siblings(1) // middle
+        assert(op != null, "Middle node should be operator.")
+        if (siblings(2) == n) // In this function we only take element we find at the left side.
         {
-          val op = siblings(1) // middle
-          assert(op != null, "Middle node should be operator.")
           if (op.name == "|||" || op.name == "|[]|") // op.name == "[>" ||
-            retList += siblings(0) // left one
+            if (siblings(0).GetIconName() != "user.gif")
+              retList += siblings(0) // left one
         }
       }
+      else throw new Exception("Problem with number of children.")
     }
 
-    //rec(this)
+    rec(this)
     return retList
   }
 
@@ -82,14 +86,15 @@ class CttNode {
       if (siblings.length == 1)
         rec(n.parent) // uninteresting layer, let's move on
       else if (siblings.length == 3) {
-        if (siblings(0) == n) // We should come from the left side
+        val op = siblings(1) // middle
+        assert(op != null, "Middle node should be operator.")
+        if (siblings(0) == n) // In this function we only take element we find at the right side.
         {
-          val op = siblings(1) // middle
-          assert(op != null, "Middle node should be operator.")
-          if (op.name == "[>" || op.name == "|||" || op.name == "|[]|")
-            retList += siblings(2) // right one
-          rec(n.parent)
+          if (op.name == "|||" || op.name == "|[]|" || op.name == "[>" )
+            if (siblings(2).GetIconName() != "user.gif")
+              retList += siblings(2) // right one
         }
+        rec(n.parent) // Do the recursive call later to get a sorted list.
       }
       else throw new Exception("Problem with number of children.")
     }
