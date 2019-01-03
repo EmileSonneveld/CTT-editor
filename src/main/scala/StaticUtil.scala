@@ -83,6 +83,7 @@ object StaticUtil {
     }
 
     def level_pass() = {
+      var somethingChanged = false
       val etss_len = etss.sets.length // Don't loop over the new ETSes
       for (i <- 0 until etss_len) {
         val ets = etss.sets(i)
@@ -113,6 +114,7 @@ object StaticUtil {
                     || lastOperator == "|>" // Todo: Investigate further
                   ) {
                     ets.tasks.insert(j, child)
+                    somethingChanged = true
                     j += 1
                   } else if (lastOperator == ">>"
                     || lastOperator == "[]>>"
@@ -132,6 +134,7 @@ object StaticUtil {
                     //  ets_new.tasks += desactivationTask
 
                     etss.sets += ets_new
+                    somethingChanged = true
                   }
                 }
               }
@@ -141,12 +144,16 @@ object StaticUtil {
           j += 1
         }
       }
+      somethingChanged
     }
 
     // Todo: Know when to stop with the loop
-    for(_ <- 0 until 100) {
-      level_pass()
-    }
+    //for (_ <- 0 until 100) {
+    //  level_pass()
+    //}
+    // Keep going till the function returns false
+    while(level_pass()){}
+
     return etss
   }
 
