@@ -11,6 +11,7 @@ How operator priority is defined: https://github.com/EmileSonneveld/CTT-editor/b
 TODO:
 -----
 - Be able to refer to tasks defined in another file.
+- Detect recursive tasks and give apropiate icon.
 - Generate enabled task sets
 	- Check more cases with Disabling task
 	- Allow to collapse []>> operators

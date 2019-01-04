@@ -185,7 +185,7 @@ object StaticUtil {
 
     while (nextCharIndex != -1) {
       val line = ctt_code.substring(currentCharIndex, nextCharIndex)
-      if (!isEmpty(line)) {
+      if (!isEmpty(line) && !line.startsWith("#")) {
         val leading_tabs = count_leading_tabs(line)
         var node = new CttNode
         node.name = line.substring(leading_tabs)
