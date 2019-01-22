@@ -1,0 +1,14 @@
+doctor_make_prescription
+	doctor_select_patient abstraction
+	[]>>
+	Should only show generic?
+	|||
+	Select_drug*
+		Show_list
+		|[]|
+		Enter_drug_name
+	[>
+	print prescription
+	>>
+	Exit
+	

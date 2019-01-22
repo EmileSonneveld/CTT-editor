@@ -1,27 +1,19 @@
 view_patient_list
 	access_list*
 		show list
-		[]>>
+		|[]|
 		filter
-			name
-				show list
-				|||
+			enter id
+			[]
+			non-id-way
 				enter name
-			[]
-			time interval
-				show calendar
-				[]>>
-				select date
-				[]>>
-				show calendar
-				[]
-				select date
-			[]
-			calendar
-			[]
-			id
-				show list
 				|||
-				enter id
+				time interval
+					show calendar
+					|[]|
+					select date
+						select start date
+						|||
+						select end date
 	[>
 	quit

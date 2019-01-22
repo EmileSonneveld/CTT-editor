@@ -1,0 +1,31 @@
+doctor_access_schedule
+	view_schedule*
+		specify options
+			select by calendar
+				show calendar
+				|[]|
+				select time scale
+					yearly
+					[]
+					monthly
+					[]
+					daily
+			[]
+			select specific day
+				enter date
+					enter day
+					|||
+					enter month
+					|||
+					enter year
+				[]>>
+				check date validity
+					show no error message
+					[]
+					show error message
+			[]
+			doctor_select_patient abstraction
+		|[]|
+		show appointment list
+	[>
+	close schedule

@@ -1,0 +1,36 @@
+doctor_update_medical_file
+	View_patient_medical_file
+	>>
+	doctor_select_patient abstraction
+	|||
+	editing session
+		Edit_file abstraction
+			add vaccination
+				enter date
+				|||
+				enter vaccination name
+			[]
+			add intolerance
+				enter molecule
+			[]
+			doctor_make_prescription abstraction
+			[]
+			add operation
+				enter date
+				|||
+				enter description
+		|||
+		[Save]
+	[]
+	Exit
+		unsaved changes
+			Show_close_without_saving_message
+			>>
+			Yes
+				close
+			[]
+			No
+				Update_patient_medical_info application
+		[]
+		close
+		

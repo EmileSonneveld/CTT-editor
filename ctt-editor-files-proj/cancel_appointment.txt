@@ -1,4 +1,4 @@
-cancel_appointment
+cancel_appointment test
 	view_appointments
 	[>
 	select_appointment

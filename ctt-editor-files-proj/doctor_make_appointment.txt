@@ -1,0 +1,10 @@
+Doctor_make_appointment
+	loop till good appointment*
+		input info
+			doctor_select_patient abstraction
+			|||
+			Select_date abstraction
+		[]>>
+		Check_feasibility
+	[>
+	Close

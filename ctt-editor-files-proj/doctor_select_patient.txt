@@ -1,0 +1,11 @@
+doctor_select_patient
+	enter information
+		select by ID
+		[]
+		enter name
+		[]
+		show patients I am in charge of interaction
+	|[]|
+	show list
+	[>
+	select patient

@@ -1,0 +1,10 @@
+view_schedule_doctor
+	Show_schedule*
+		View_in_calendar abstraction
+		|||
+		Choose_filter
+			Show_all
+			[]
+			Select_patient abstraction
+	[>
+	Exit

@@ -1,0 +1,17 @@
+Access_medical_file
+	doctor_select_patient abstraction
+	[]>>
+	View_Medical_file*
+		Show_patient_basic_information
+		|||
+		Show_medical_file
+			Show_medical_file_tab
+			|||
+			Choose_tab
+				Vaccinations
+				[]
+				Drug_intolerance
+				[]
+				Surgery					
+	[>
+	Exit

@@ -1,0 +1,4 @@
+doctor_all
+	_doctor_portal*
+	[>
+	quit program

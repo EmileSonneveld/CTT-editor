@@ -8,7 +8,7 @@ patient_make_appointment
 		>>
 		following
 			OK
-				ask for confirmation
+				ask for confirmation application
 				>>
 				confirm
 			[]
@@ -23,6 +23,6 @@ patient_make_appointment
 						[]>>
 						show confirmation message
 					[]
-					cancel_procedure
+					cancel_procedure abstraction
 	[]
 	by phone

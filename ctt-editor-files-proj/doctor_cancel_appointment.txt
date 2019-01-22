@@ -1,0 +1,13 @@
+Cancel_appointment
+	what appointments to show
+		doctor_select_patient abstraction
+		[]
+		select date range
+	[]>>
+	Show_appointment_list
+	>>
+	Select_appointment
+	>>
+	Show_confirmation_box
+	[>
+	Exit

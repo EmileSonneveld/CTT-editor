@@ -1,0 +1,24 @@
+view_patient_schedule
+	Select_patient abstraction
+	>>
+	Filter_doctor
+		By_sector
+			Browse_sector
+				Show_sector
+				|[]|
+				Select_sector
+				>>
+				[Browse_sector]
+			>>
+			Select_doctor	
+		[]
+		By_name
+			Show_list_name
+			|[]|
+			Select_in_list
+	[]>>
+	View_in_calendar
+	>>
+	Exit
+		
+	
