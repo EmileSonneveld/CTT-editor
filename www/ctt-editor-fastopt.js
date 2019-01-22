@@ -3543,7 +3543,9 @@ function $c_Lmain_scala_CttEditor$() {
   this.cttMessage$1 = null;
   this.cttSvgDownload$1 = null;
   this.wantToUpladCtt$1 = false;
-  this.cttUploadingInProccess$1 = false
+  this.cttUploadingInProccess$1 = false;
+  this.cttHandlingError$1 = null;
+  this.uploadError$1 = null
 }
 $c_Lmain_scala_CttEditor$.prototype = new $h_O();
 $c_Lmain_scala_CttEditor$.prototype.constructor = $c_Lmain_scala_CttEditor$;
@@ -3560,6 +3562,22 @@ $c_Lmain_scala_CttEditor$.prototype.gotNewFileContent__Lorg_scalajs_dom_raw_Even
   this.cttArea$1.value = ctt_code;
   this.cttChanged__Lorg_scalajs_dom_raw_Event__V(null)
 });
+$c_Lmain_scala_CttEditor$.prototype.main$scala$CttEditor$$$anonfun$cttUploadingBeatingHearth$2__Lorg_scalajs_dom_raw_Event__Lorg_scalajs_dom_raw_XMLHttpRequest__O = (function(e, oReq$1) {
+  if (($uI(oReq$1.readyState) === 4)) {
+    if (($uI(oReq$1.status) >= 500)) {
+      $m_Lmain_scala_CttEditor$().uploadError$1 = ((("Problem status: " + $uI(oReq$1.status)) + " responseText: ") + $as_T(oReq$1.responseText))
+    } else {
+      $m_Lmain_scala_CttEditor$().uploadError$1 = ""
+    };
+    $m_Lmain_scala_CttEditor$().ApplyErrorMessage__V();
+    return $uI($m_Lorg_scalajs_dom_package$().window__Lorg_scalajs_dom_raw_Window().setTimeout((function() {
+      $m_Lmain_scala_CttEditor$();
+      $m_Lmain_scala_CttEditor$().fileUploaded$unddelayed__V()
+    }), 500.0))
+  } else {
+    return (void 0)
+  }
+});
 $c_Lmain_scala_CttEditor$.prototype.init___ = (function() {
   $n_Lmain_scala_CttEditor$ = this;
   this.cttArea$1 = $m_Lorg_scalajs_dom_package$().document__Lorg_scalajs_dom_raw_HTMLDocument().body.querySelector("#ctt-texarea");
@@ -3573,6 +3591,8 @@ $c_Lmain_scala_CttEditor$.prototype.init___ = (function() {
   this.cttSvgDownload$1 = $m_Lorg_scalajs_dom_package$().document__Lorg_scalajs_dom_raw_HTMLDocument().body.querySelector("#ctt-svg-download");
   this.wantToUpladCtt$1 = false;
   this.cttUploadingInProccess$1 = false;
+  this.cttHandlingError$1 = "";
+  this.uploadError$1 = "";
   return this
 });
 $c_Lmain_scala_CttEditor$.prototype.makeNewCtt__p1__Lorg_scalajs_dom_raw_Event__V = (function(evt) {
@@ -3583,7 +3603,7 @@ $c_Lmain_scala_CttEditor$.prototype.makeNewCtt__p1__Lorg_scalajs_dom_raw_Event__
   var oReq = new $g.XMLHttpRequest();
   oReq.open("POST", ("../ctt-editor-files/" + newCttName), false);
   oReq.setRequestHeader("file_content", $as_T($g.encodeURI("")));
-  oReq.send();
+  oReq.send("");
   this.loadFileList__p1__V();
   this.cttFiles$1.value = newCttName;
   this.cttArea$1.value = ""
@@ -3594,21 +3614,18 @@ $c_Lmain_scala_CttEditor$.prototype.selectedFileChanged__p1__Lorg_scalajs_dom_ra
     $m_Lmain_scala_CttEditor$();
     $m_Lmain_scala_CttEditor$().gotNewFileContent__Lorg_scalajs_dom_raw_Event__V(arg1$2)
   }));
-  oReq.open("GET", ("../ctt-editor-files/" + $as_T(this.cttFiles$1.value)));
+  oReq.open("GET", ("../ctt-editor-files/" + $as_T(this.cttFiles$1.value)), false);
   oReq.send()
 });
-$c_Lmain_scala_CttEditor$.prototype.fileUploadedSucces__Lorg_scalajs_dom_raw_Event__I = (function(evt) {
-  this.cttMessage$1.innerHTML = "";
-  return $uI($m_Lorg_scalajs_dom_package$().window__Lorg_scalajs_dom_raw_Window().setTimeout((function() {
-    $m_Lmain_scala_CttEditor$();
-    $m_Lmain_scala_CttEditor$().fileUploaded$unddelayed__V()
-  }), 500.0))
+$c_Lmain_scala_CttEditor$.prototype.ApplyErrorMessage__V = (function() {
+  this.cttMessage$1.innerHTML = (("" + this.cttHandlingError$1) + this.uploadError$1)
 });
 $c_Lmain_scala_CttEditor$.prototype.cttSvgDownloadClicked__p1__Lorg_scalajs_dom_raw_Event__V = (function(evt) {
   var newCttName = ($as_T(this.cttFiles$1.value) + ".svg");
   var ctt = $m_Lmain_scala_StaticUtil$().linear$undparse$undctt__T__Lmain_scala_CttNode($as_T(this.cttArea$1.value));
   if ($uZ(this.cttNormalize$1.checked)) {
-    $m_Lmain_scala_StaticUtil$().normalise$undctt__Lmain_scala_CttNode__V(ctt)
+    var this$1 = $m_Lmain_scala_StaticUtil$();
+    this$1.rec$1__p1__Lmain_scala_CttNode__V(ctt)
   };
   var svg = $m_Lmain_scala_StaticUtil$().ctt$undcode$undto$undsvg__Lmain_scala_CttNode__T(ctt);
   this.download__T__T__V(newCttName, svg)
@@ -3707,9 +3724,6 @@ $c_Lmain_scala_CttEditor$.prototype.fileUploaded$unddelayed__V = (function() {
   this.cttUploadingInProccess$1 = false;
   this.cttUploadingBeatingHearth__V()
 });
-$c_Lmain_scala_CttEditor$.prototype.addClickedMessage__V = (function() {
-  this.appendPar__Lorg_scalajs_dom_raw_Node__T__V($m_Lorg_scalajs_dom_package$().document__Lorg_scalajs_dom_raw_HTMLDocument().body, "You clicked the button!")
-});
 $c_Lmain_scala_CttEditor$.prototype.main__AT__V = (function(args) {
   var b = new $c_scm_StringBuilder().init___();
   var elem$1 = false;
@@ -3787,30 +3801,37 @@ $c_Lmain_scala_CttEditor$.prototype.main__AT__V = (function(args) {
   this.cttFiles$1.selectedIndex = 0;
   this.selectedFileChanged__p1__Lorg_scalajs_dom_raw_Event__V(null)
 });
+$c_Lmain_scala_CttEditor$.prototype.addClickedMessage__V = (function() {
+  this.appendPar__Lorg_scalajs_dom_raw_Node__T__V($m_Lorg_scalajs_dom_package$().document__Lorg_scalajs_dom_raw_HTMLDocument().body, "You clicked the button!")
+});
 $c_Lmain_scala_CttEditor$.prototype.cttChanged__Lorg_scalajs_dom_raw_Event__V = (function(evt) {
   try {
-    this.cttMessage$1.innerHTML = "";
+    this.cttHandlingError$1 = "";
+    this.ApplyErrorMessage__V();
     var ctt_code = $as_T(this.cttArea$1.value);
     var ctt = $m_Lmain_scala_StaticUtil$().linear$undparse$undctt__T__Lmain_scala_CttNode(ctt_code);
     if ($uZ(this.cttNormalize$1.checked)) {
-      $m_Lmain_scala_StaticUtil$().normalise$undctt__Lmain_scala_CttNode__V(ctt)
+      var this$1 = $m_Lmain_scala_StaticUtil$();
+      this$1.rec$1__p1__Lmain_scala_CttNode__V(ctt)
     };
     this.cttHolder$1.innerHTML = $m_Lmain_scala_StaticUtil$().ctt$undcode$undto$undsvg__Lmain_scala_CttNode__T(ctt);
     if ((!$uZ(this.cttNormalize$1.checked))) {
-      $m_Lmain_scala_StaticUtil$().normalise$undctt__Lmain_scala_CttNode__V(ctt)
+      var this$2 = $m_Lmain_scala_StaticUtil$();
+      this$2.rec$1__p1__Lmain_scala_CttNode__V(ctt)
     };
     var jsx$1 = this.cttEts$1;
-    var this$1 = $m_Lmain_scala_StaticUtil$().ctt$undto$undenabled$undtask$undsets__Lmain_scala_CttNode__Lmain_scala_EnabledTaskSets(ctt);
-    var this$2 = this$1.sets$1;
-    var this$3 = this$2.scala$collection$mutable$ListBuffer$$start$6;
-    var thiz = $f_sc_TraversableOnce__mkString__T__T__T__T(this$3, "", "\n", "");
+    var this$3 = $m_Lmain_scala_StaticUtil$().ctt$undto$undenabled$undtask$undsets__Lmain_scala_CttNode__Lmain_scala_EnabledTaskSets(ctt);
+    var this$4 = this$3.sets$1;
+    var this$5 = this$4.scala$collection$mutable$ListBuffer$$start$6;
+    var thiz = $f_sc_TraversableOnce__mkString__T__T__T__T(this$5, "", "\n", "");
     jsx$1.innerHTML = $as_T(thiz.split("\n").join("<br/>\n"));
     this.wantToUpladCtt$1 = true;
     this.cttUploadingBeatingHearth__V()
   } catch (e) {
     var e$2 = $m_sjsr_package$().wrapJavaScriptException__O__jl_Throwable(e);
     if ((e$2 !== null)) {
-      this.cttMessage$1.innerHTML = e$2.getMessage__T()
+      this.cttHandlingError$1 = e$2.getMessage__T();
+      this.ApplyErrorMessage__V()
     } else {
       throw e
     }
@@ -3820,60 +3841,54 @@ $c_Lmain_scala_CttEditor$.prototype.cttUploadingBeatingHearth__V = (function() {
   if (this.wantToUpladCtt$1) {
     if ((!this.cttUploadingInProccess$1)) {
       try {
-        this.cttMessage$1.innerHTML = "";
+        this.uploadError$1 = "";
+        this.ApplyErrorMessage__V();
         var ctt_code = $as_T(this.cttArea$1.value);
         var ctt = $m_Lmain_scala_StaticUtil$().linear$undparse$undctt__T__Lmain_scala_CttNode(ctt_code);
         if ($uZ(this.cttNormalize$1.checked)) {
-          $m_Lmain_scala_StaticUtil$().normalise$undctt__Lmain_scala_CttNode__V(ctt)
+          var this$1 = $m_Lmain_scala_StaticUtil$();
+          this$1.rec$1__p1__Lmain_scala_CttNode__V(ctt)
         };
         this.cttHolder$1.innerHTML = $m_Lmain_scala_StaticUtil$().ctt$undcode$undto$undsvg__Lmain_scala_CttNode__T(ctt);
         if ((!$uZ(this.cttNormalize$1.checked))) {
-          $m_Lmain_scala_StaticUtil$().normalise$undctt__Lmain_scala_CttNode__V(ctt)
+          var this$2 = $m_Lmain_scala_StaticUtil$();
+          this$2.rec$1__p1__Lmain_scala_CttNode__V(ctt)
         };
         var jsx$1 = this.cttEts$1;
-        var this$1 = $m_Lmain_scala_StaticUtil$().ctt$undto$undenabled$undtask$undsets__Lmain_scala_CttNode__Lmain_scala_EnabledTaskSets(ctt);
-        var this$2 = this$1.sets$1;
-        var this$3 = this$2.scala$collection$mutable$ListBuffer$$start$6;
-        var thiz = $f_sc_TraversableOnce__mkString__T__T__T__T(this$3, "", "\n", "");
+        var this$3 = $m_Lmain_scala_StaticUtil$().ctt$undto$undenabled$undtask$undsets__Lmain_scala_CttNode__Lmain_scala_EnabledTaskSets(ctt);
+        var this$4 = this$3.sets$1;
+        var this$5 = this$4.scala$collection$mutable$ListBuffer$$start$6;
+        var thiz = $f_sc_TraversableOnce__mkString__T__T__T__T(this$5, "", "\n", "");
         jsx$1.innerHTML = $as_T(thiz.split("\n").join("<br/>\n"));
         var oReq = new $g.XMLHttpRequest();
-        oReq.addEventListener("load", (function(arg1$2) {
+        oReq.addEventListener("error", (function(arg1$2) {
           $m_Lmain_scala_CttEditor$();
-          return $m_Lmain_scala_CttEditor$().fileUploadedSucces__Lorg_scalajs_dom_raw_Event__I(arg1$2)
+          return $m_Lmain_scala_CttEditor$().fileUploadInterenetFailed__Lorg_scalajs_dom_raw_Event__I(arg1$2)
         }));
-        oReq.addEventListener("error", (function(arg1$2$1) {
-          $m_Lmain_scala_CttEditor$();
-          return $m_Lmain_scala_CttEditor$().fileUploadFailed__Lorg_scalajs_dom_raw_Event__I(arg1$2$1)
-        }));
+        oReq.onreadystatechange = (function(oReq$1) {
+          return (function(arg1$2$1) {
+            return $m_Lmain_scala_CttEditor$().main$scala$CttEditor$$$anonfun$cttUploadingBeatingHearth$2__Lorg_scalajs_dom_raw_Event__Lorg_scalajs_dom_raw_XMLHttpRequest__O(arg1$2$1, oReq$1)
+          })
+        })(oReq);
         oReq.open("POST", ("../ctt-editor-files/" + $as_T(this.cttFiles$1.value)));
         oReq.setRequestHeader("file_content", $as_T($g.encodeURI(ctt_code)));
-        oReq.send();
+        oReq.send(ctt_code);
         this.cttUploadingInProccess$1 = true;
         this.wantToUpladCtt$1 = false;
-        var this$9 = $m_s_Console$();
-        var this$10 = $as_Ljava_io_PrintStream(this$9.outVar$2.v$1);
-        this$10.java$lang$JSConsoleBasedPrintStream$$printString__T__V("cttChanged and was valid\n")
+        var this$11 = $m_s_Console$();
+        var this$12 = $as_Ljava_io_PrintStream(this$11.outVar$2.v$1);
+        this$12.java$lang$JSConsoleBasedPrintStream$$printString__T__V("cttChanged and was valid\n")
       } catch (e) {
         var e$2 = $m_sjsr_package$().wrapJavaScriptException__O__jl_Throwable(e);
         if ((e$2 !== null)) {
-          this.cttMessage$1.innerHTML = e$2.getMessage__T()
+          this.uploadError$1 = e$2.getMessage__T();
+          this.ApplyErrorMessage__V()
         } else {
           throw e
         }
       }
     }
   }
-});
-$c_Lmain_scala_CttEditor$.prototype.fileUploadFailed__Lorg_scalajs_dom_raw_Event__I = (function(evt) {
-  if (($as_T($m_Lorg_scalajs_dom_package$().window__Lorg_scalajs_dom_raw_Window().location.protocol) === "file:")) {
-    this.cttMessage$1.innerHTML = "CTT upload failed. <br/>This app should be accesed trough a webserver, not as a plain HTML-file."
-  } else {
-    this.cttMessage$1.innerHTML = "CTT upload failed. <br/>Submit issue here: https://github.com/EmileSonneveld/CTT-editor"
-  };
-  return $uI($m_Lorg_scalajs_dom_package$().window__Lorg_scalajs_dom_raw_Window().setTimeout((function() {
-    $m_Lmain_scala_CttEditor$();
-    $m_Lmain_scala_CttEditor$().fileUploaded$unddelayed__V()
-  }), 500.0))
 });
 $c_Lmain_scala_CttEditor$.prototype.loadFileList__p1__V = (function() {
   var oReq = new $g.XMLHttpRequest();
@@ -3898,6 +3913,14 @@ $c_Lmain_scala_CttEditor$.prototype.appendPar__Lorg_scalajs_dom_raw_Node__T__V =
   var textNode = $m_Lorg_scalajs_dom_package$().document__Lorg_scalajs_dom_raw_HTMLDocument().createTextNode(text);
   parNode.appendChild(textNode);
   targetNode.appendChild(parNode)
+});
+$c_Lmain_scala_CttEditor$.prototype.fileUploadInterenetFailed__Lorg_scalajs_dom_raw_Event__I = (function(evt) {
+  this.uploadError$1 = "Internet connection problem.";
+  this.ApplyErrorMessage__V();
+  return $uI($m_Lorg_scalajs_dom_package$().window__Lorg_scalajs_dom_raw_Window().setTimeout((function() {
+    $m_Lmain_scala_CttEditor$();
+    $m_Lmain_scala_CttEditor$().fileUploaded$unddelayed__V()
+  }), 500.0))
 });
 var $d_Lmain_scala_CttEditor$ = new $TypeData().initClass({
   Lmain_scala_CttEditor$: 0
@@ -3948,19 +3971,6 @@ $c_Lmain_scala_CttNode.prototype.displayName__T = (function() {
   };
   return this.name$1
 });
-$c_Lmain_scala_CttNode.prototype.init___ = (function() {
-  this.name$1 = "untitled_node";
-  this.children$1 = $as_scm_ListBuffer($m_scm_ListBuffer$().apply__sc_Seq__sc_GenTraversable($m_sci_Nil$()));
-  this.pos$1 = new $c_Lmain_scala_Vector2D().init___D__D((-1.0), (-1.0));
-  this.width$1 = (-1.0);
-  $m_sci_List$();
-  var array = ["abstraction", "application", "interaction", "user"];
-  var xs = new $c_sjs_js_WrappedArray().init___sjs_js_Array(array);
-  var this$4 = $m_sci_List$();
-  var cbf = this$4.ReusableCBFInstance$2;
-  this.icons$1 = $as_sci_List($f_sc_TraversableLike__to__scg_CanBuildFrom__O(xs, cbf));
-  return this
-});
 $c_Lmain_scala_CttNode.prototype.addChild__Lmain_scala_CttNode__I__V = (function(child, index) {
   child.parent$1 = this;
   var idx = index;
@@ -3973,6 +3983,19 @@ $c_Lmain_scala_CttNode.prototype.addChild__Lmain_scala_CttNode__I__V = (function
   var array = [child];
   var elems = new $c_sjs_js_WrappedArray().init___sjs_js_Array(array);
   this$4.insertAll__I__sc_Traversable__V(n, elems)
+});
+$c_Lmain_scala_CttNode.prototype.init___ = (function() {
+  this.name$1 = "untitled_node";
+  this.children$1 = $as_scm_ListBuffer($m_scm_ListBuffer$().apply__sc_Seq__sc_GenTraversable($m_sci_Nil$()));
+  this.pos$1 = new $c_Lmain_scala_Vector2D().init___D__D((-1.0), (-1.0));
+  this.width$1 = (-1.0);
+  $m_sci_List$();
+  var array = ["abstraction", "application", "interaction", "user"];
+  var xs = new $c_sjs_js_WrappedArray().init___sjs_js_Array(array);
+  var this$4 = $m_sci_List$();
+  var cbf = this$4.ReusableCBFInstance$2;
+  this.icons$1 = $as_sci_List($f_sc_TraversableLike__to__scg_CanBuildFrom__O(xs, cbf));
+  return this
 });
 $c_Lmain_scala_CttNode.prototype.GetIconName__T = (function() {
   var x = this.name$1;
@@ -4004,11 +4027,85 @@ $c_Lmain_scala_CttNode.prototype.minimumWidth__D = (function() {
   var b = $imul(6, $uI(thiz.length));
   return ((b < 32) ? 32 : b)
 });
+$c_Lmain_scala_CttNode.prototype.findTaskLeftUp__scm_ListBuffer = (function() {
+  var elem = $as_scm_ListBuffer($m_scm_ListBuffer$().apply__sc_Seq__sc_GenTraversable($m_sci_Nil$()));
+  var retList = new $c_sr_ObjectRef().init___O(elem);
+  this.rec$1__p1__Lmain_scala_CttNode__sr_ObjectRef__V(this, retList);
+  return $as_scm_ListBuffer(retList.elem$1)
+});
 $c_Lmain_scala_CttNode.prototype.toString__T = (function() {
   return this.displayName__T()
 });
+$c_Lmain_scala_CttNode.prototype.rec$1__p1__Lmain_scala_CttNode__sr_ObjectRef__V = (function(n, retList$1) {
+  _rec: while (true) {
+    if ((n.parent$1 === null)) {
+      return (void 0)
+    };
+    var siblings = n.parent$1.children$1;
+    if ((siblings.len$6 === 1)) {
+      n = n.parent$1;
+      continue _rec
+    } else if ((siblings.len$6 === 3)) {
+      this.rec$1__p1__Lmain_scala_CttNode__sr_ObjectRef__V(n.parent$1, retList$1);
+      var op = $as_Lmain_scala_CttNode(siblings.apply__I__O(1));
+      var assertion = (op !== null);
+      if ((!assertion)) {
+        throw new $c_jl_AssertionError().init___O("assertion failed: Middle node should be operator.")
+      };
+      var x$2 = siblings.apply__I__O(2);
+      var x$3 = n;
+      if (((x$2 === null) ? (x$3 === null) : $objectEquals(x$2, x$3))) {
+        if (((op.name$1 === "|||") || (op.name$1 === "|[]|"))) {
+          if (($as_Lmain_scala_CttNode(siblings.apply__I__O(0)).GetIconName__T() !== "user.gif")) {
+            $as_scm_ListBuffer(retList$1.elem$1).$$plus$eq__O__scm_ListBuffer(siblings.apply__I__O(0))
+          }
+        }
+      }
+    } else {
+      throw $m_sjsr_package$().unwrapJavaScriptException__jl_Throwable__O(new $c_jl_Exception().init___T("Problem with number of children."))
+    };
+    break
+  }
+});
+$c_Lmain_scala_CttNode.prototype.findTaskRightUp__scm_ListBuffer = (function() {
+  var elem = $as_scm_ListBuffer($m_scm_ListBuffer$().apply__sc_Seq__sc_GenTraversable($m_sci_Nil$()));
+  var elem$1 = null;
+  elem$1 = elem;
+  var n = this;
+  _rec: while (true) {
+    if ((n.parent$1 === null)) {
+      break
+    };
+    var siblings = n.parent$1.children$1;
+    if ((siblings.len$6 === 1)) {
+      n = n.parent$1;
+      continue _rec
+    } else if ((siblings.len$6 === 3)) {
+      var op = $as_Lmain_scala_CttNode(siblings.apply__I__O(1));
+      var assertion = (op !== null);
+      if ((!assertion)) {
+        throw new $c_jl_AssertionError().init___O("assertion failed: Middle node should be operator.")
+      };
+      var x$2 = siblings.apply__I__O(0);
+      var x$3 = n;
+      if (((x$2 === null) ? (x$3 === null) : $objectEquals(x$2, x$3))) {
+        if ((((op.name$1 === "|||") || (op.name$1 === "|[]|")) || (op.name$1 === "[>"))) {
+          if (($as_Lmain_scala_CttNode(siblings.apply__I__O(2)).GetIconName__T() !== "user.gif")) {
+            $as_scm_ListBuffer(elem$1).$$plus$eq__O__scm_ListBuffer(siblings.apply__I__O(2))
+          }
+        }
+      };
+      n = n.parent$1;
+      continue _rec
+    } else {
+      throw $m_sjsr_package$().unwrapJavaScriptException__jl_Throwable__O(new $c_jl_Exception().init___T("Problem with number of children."))
+    };
+    break
+  };
+  return $as_scm_ListBuffer(elem$1)
+});
 $c_Lmain_scala_CttNode.prototype.Operator__Lmain_scala_CttOperator = (function() {
-  var nonLocalReturnKey2 = new $c_O().init___();
+  var nonLocalReturnKey1 = new $c_O().init___();
   try {
     var thiz = this.name$1;
     var thiz$2 = $as_T(thiz.toLowerCase());
@@ -4032,7 +4129,7 @@ $c_Lmain_scala_CttNode.prototype.Operator__Lmain_scala_CttOperator = (function()
       var op = $as_Lmain_scala_CttOperator(arg1);
       var prefix = op.name$1;
       if ((($uI(n.length) >= 0) && ($as_T(n.substring(0, $uI(prefix.length))) === prefix))) {
-        throw new $c_sr_NonLocalReturnControl().init___O__O(nonLocalReturnKey2, op)
+        throw new $c_sr_NonLocalReturnControl().init___O__O(nonLocalReturnKey1, op)
       };
       these = $as_sci_List(these.tail__O())
     };
@@ -4040,55 +4137,8 @@ $c_Lmain_scala_CttNode.prototype.Operator__Lmain_scala_CttOperator = (function()
   } catch (e) {
     if ($is_sr_NonLocalReturnControl(e)) {
       var ex = $as_sr_NonLocalReturnControl(e);
-      if ((ex.key$2 === nonLocalReturnKey2)) {
-        return $as_Lmain_scala_CttOperator(ex.value__O())
-      } else {
-        throw ex
-      }
-    } else {
-      throw e
-    }
-  }
-});
-$c_Lmain_scala_CttNode.prototype.findDesactivationTaskRightUp__Lmain_scala_CttNode = (function() {
-  return this.rec$1__p1__Lmain_scala_CttNode__Lmain_scala_CttNode(this)
-});
-$c_Lmain_scala_CttNode.prototype.rec$1__p1__Lmain_scala_CttNode__Lmain_scala_CttNode = (function(n) {
-  var nonLocalReturnKey1 = new $c_O().init___();
-  try {
-    if ((n.parent$1 === null)) {
-      return null
-    };
-    var elem$1 = false;
-    elem$1 = false;
-    var elem$1$1 = false;
-    elem$1$1 = false;
-    var this$3 = n.parent$1.children$1;
-    var this$4 = this$3.scala$collection$mutable$ListBuffer$$start$6;
-    var these = this$4;
-    while ((!these.isEmpty__Z())) {
-      var arg1 = these.head__O();
-      var sibling = $as_Lmain_scala_CttNode(arg1);
-      if (elem$1) {
-        if (elem$1$1) {
-          throw new $c_sr_NonLocalReturnControl().init___O__O(nonLocalReturnKey1, sibling)
-        } else {
-          var op = sibling.Operator__Lmain_scala_CttOperator();
-          if (((op !== null) && (op.name$1 === "[>"))) {
-            elem$1$1 = true
-          }
-        }
-      } else if ((sibling === n)) {
-        elem$1 = true
-      };
-      these = $as_sci_List(these.tail__O())
-    };
-    return this.rec$1__p1__Lmain_scala_CttNode__Lmain_scala_CttNode(n.parent$1)
-  } catch (e) {
-    if ($is_sr_NonLocalReturnControl(e)) {
-      var ex = $as_sr_NonLocalReturnControl(e);
       if ((ex.key$2 === nonLocalReturnKey1)) {
-        return $as_Lmain_scala_CttNode(ex.value__O())
+        return $as_Lmain_scala_CttOperator(ex.value__O())
       } else {
         throw ex
       }
@@ -4406,9 +4456,12 @@ $c_Lmain_scala_StaticUtil$.prototype.isEmpty__T__Z = (function(x) {
 $c_Lmain_scala_StaticUtil$.prototype.shrink$undstack__scm_Stack__I__V = (function(stack, size) {
   var this$1 = stack.elems$5;
   var stackSize = $f_sc_LinearSeqOptimized__length__I(this$1);
-  $m_s_Predef$().assert__Z__V((stackSize >= size));
-  var this$3 = stack.elems$5;
-  var end = (($f_sc_LinearSeqOptimized__length__I(this$3) - size) | 0);
+  var assertion = (stackSize >= size);
+  if ((!assertion)) {
+    throw new $c_jl_AssertionError().init___O("assertion failed: Some indentation might be wrong")
+  };
+  var this$4 = stack.elems$5;
+  var end = (($f_sc_LinearSeqOptimized__length__I(this$4) - size) | 0);
   var isEmpty$4 = (end <= 0);
   var scala$collection$immutable$Range$$lastElement$4 = (((-1) + end) | 0);
   if ((!isEmpty$4)) {
@@ -4446,12 +4499,6 @@ $c_Lmain_scala_StaticUtil$.prototype.calculateWidth__Lmain_scala_CttNode__V = (f
   var b = elem$1;
   node.width$1 = (10.0 + $uD($g.Math.max(a, b)))
 });
-$c_Lmain_scala_StaticUtil$.prototype.normalise$undctt__Lmain_scala_CttNode__V = (function(ctt) {
-  var this$2 = $m_s_Console$();
-  var this$3 = $as_Ljava_io_PrintStream(this$2.outVar$2.v$1);
-  this$3.java$lang$JSConsoleBasedPrintStream$$printString__T__V("normalise_ctt\n");
-  this.rec$1__p1__Lmain_scala_CttNode__V(ctt)
-});
 $c_Lmain_scala_StaticUtil$.prototype.rec$1__p1__Lmain_scala_CttNode__V = (function(n) {
   var prio = 1;
   while ((prio <= $m_Lmain_scala_CttNode$().maxCttPriority__I())) {
@@ -4465,7 +4512,10 @@ $c_Lmain_scala_StaticUtil$.prototype.rec$1__p1__Lmain_scala_CttNode__V = (functi
         if ((jsx$1 < this$2.len$6)) {
           var child = $as_Lmain_scala_CttNode(n.children$1.apply__I__O(i));
           var op = child.Operator__Lmain_scala_CttOperator();
-          $m_s_Predef$().assert__Z__V((op !== null));
+          var assertion = (op !== null);
+          if ((!assertion)) {
+            throw new $c_jl_AssertionError().init___O("assertion failed: Missing operator somewhere?")
+          };
           if ((op.priority$1 === prio)) {
             didSomething = true;
             var left = $as_Lmain_scala_CttNode(n.children$1.apply__I__O((((-1) + i) | 0)));
@@ -4490,9 +4540,9 @@ $c_Lmain_scala_StaticUtil$.prototype.rec$1__p1__Lmain_scala_CttNode__V = (functi
       prio = ((1 + prio) | 0)
     }
   };
-  var this$3 = n.children$1;
-  var this$4 = this$3.scala$collection$mutable$ListBuffer$$start$6;
-  var these = this$4;
+  var this$4 = n.children$1;
+  var this$5 = this$4.scala$collection$mutable$ListBuffer$$start$6;
+  var these = this$5;
   while ((!these.isEmpty__Z())) {
     var arg1 = these.head__O();
     var child$2 = $as_Lmain_scala_CttNode(arg1);
@@ -4507,1009 +4557,86 @@ $c_Lmain_scala_StaticUtil$.prototype.ctt$undto$undenabled$undtask$undsets__Lmain
   var ets = new $c_Lmain_scala_EnabledTaskSet().init___();
   ets.tasks$1.$$plus$eq__O__scm_ListBuffer(ctt);
   $as_Lmain_scala_EnabledTaskSets(elem$1).sets$1.$$plus$eq__O__scm_ListBuffer(ets);
-  var this$2 = $as_Lmain_scala_EnabledTaskSets(elem$1).sets$1;
-  var etss_len = this$2.len$6;
-  var isEmpty$4 = (etss_len <= 0);
-  var scala$collection$immutable$Range$$lastElement$4 = (((-1) + etss_len) | 0);
-  if ((!isEmpty$4)) {
-    var i = 0;
-    while (true) {
-      var v1 = i;
-      var ets$1 = $as_Lmain_scala_EnabledTaskSet($as_Lmain_scala_EnabledTaskSets(elem$1).sets$1.apply__I__O(v1));
-      var this$7 = $m_s_Console$();
-      var this$8 = $as_Ljava_io_PrintStream(this$7.outVar$2.v$1);
-      this$8.java$lang$JSConsoleBasedPrintStream$$printString__T__V("Enabled task set\n");
-      var elem$1$1 = 0;
-      elem$1$1 = 0;
+  while (true) {
+    var elem$1$1 = false;
+    elem$1$1 = false;
+    var this$3 = $as_Lmain_scala_EnabledTaskSets(elem$1).sets$1;
+    var etss_len = this$3.len$6;
+    var isEmpty$4 = (etss_len <= 0);
+    var scala$collection$immutable$Range$$lastElement$4 = (((-1) + etss_len) | 0);
+    if ((!isEmpty$4)) {
+      var i = 0;
       while (true) {
-        var jsx$1 = elem$1$1;
-        var this$10 = ets$1.tasks$1;
-        if ((jsx$1 < this$10.len$6)) {
-          var task = $as_Lmain_scala_CttNode(ets$1.tasks$1.apply__I__O(elem$1$1));
-          var x = ((("  task: " + task) + "  j: ") + elem$1$1);
-          var this$12 = $m_s_Console$();
-          var this$13 = $as_Ljava_io_PrintStream(this$12.outVar$2.v$1);
-          this$13.java$lang$JSConsoleBasedPrintStream$$printString__T__V((x + "\n"));
-          var this$14 = task.children$1;
-          if ((this$14.len$6 > 0)) {
-            ets$1.tasks$1.remove__I__O(elem$1$1);
-            var elem$1$2 = null;
-            elem$1$2 = "";
-            var this$16 = task.children$1;
-            var this$17 = this$16.scala$collection$mutable$ListBuffer$$start$6;
-            var these = this$17;
-            while ((!these.isEmpty__Z())) {
-              var arg1 = these.head__O();
-              var child = $as_Lmain_scala_CttNode(arg1);
-              if ((child.Operator__Lmain_scala_CttOperator() !== null)) {
-                elem$1$2 = child.Operator__Lmain_scala_CttOperator().name$1
-              } else if ((((((((($as_T(elem$1$2) === "") || ($as_T(elem$1$2) === "[]")) || ($as_T(elem$1$2) === "|=|")) || ($as_T(elem$1$2) === "||")) || ($as_T(elem$1$2) === "|||")) || ($as_T(elem$1$2) === "|[]|")) || ($as_T(elem$1$2) === "[>")) || ($as_T(elem$1$2) === "|>"))) {
-                var this$20 = ets$1.tasks$1;
-                var n = elem$1$1;
-                var array = [child];
-                var elems = new $c_sjs_js_WrappedArray().init___sjs_js_Array(array);
-                this$20.insertAll__I__sc_Traversable__V(n, elems);
-                elem$1$1 = ((1 + elem$1$1) | 0)
-              } else if ((($as_T(elem$1$2) === ">>") || ($as_T(elem$1$2) === "[]>>"))) {
-                var ets_new = new $c_Lmain_scala_EnabledTaskSet().init___();
-                ets_new.tasks$1.$$plus$eq__O__scm_ListBuffer(child);
-                var desactivationTask = child.findDesactivationTaskRightUp__Lmain_scala_CttNode();
-                if ((desactivationTask !== null)) {
-                  ets_new.tasks$1.$$plus$eq__O__scm_ListBuffer(desactivationTask)
+        var v1 = i;
+        var ets$1 = $as_Lmain_scala_EnabledTaskSet($as_Lmain_scala_EnabledTaskSets(elem$1).sets$1.apply__I__O(v1));
+        var elem$1$2 = 0;
+        elem$1$2 = 0;
+        while (true) {
+          var jsx$1 = elem$1$2;
+          var this$8 = ets$1.tasks$1;
+          if ((jsx$1 < this$8.len$6)) {
+            var task = $as_Lmain_scala_CttNode(ets$1.tasks$1.apply__I__O(elem$1$2));
+            var this$9 = task.children$1;
+            if ((this$9.len$6 > 0)) {
+              ets$1.tasks$1.remove__I__O(elem$1$2);
+              var elem$1$3 = null;
+              elem$1$3 = "";
+              var this$11 = task.children$1;
+              var this$12 = this$11.scala$collection$mutable$ListBuffer$$start$6;
+              var these = this$12;
+              while ((!these.isEmpty__Z())) {
+                var arg1 = these.head__O();
+                var child = $as_Lmain_scala_CttNode(arg1);
+                if ((child.Operator__Lmain_scala_CttOperator() !== null)) {
+                  elem$1$3 = child.Operator__Lmain_scala_CttOperator().name$1
+                } else if ((child.GetIconName__T() !== "user.gif")) {
+                  if ((((((((($as_T(elem$1$3) === "") || ($as_T(elem$1$3) === "[]")) || ($as_T(elem$1$3) === "|=|")) || ($as_T(elem$1$3) === "||")) || ($as_T(elem$1$3) === "|||")) || ($as_T(elem$1$3) === "|[]|")) || ($as_T(elem$1$3) === "[>")) || ($as_T(elem$1$3) === "|>"))) {
+                    var this$15 = ets$1.tasks$1;
+                    var n = elem$1$2;
+                    var array = [child];
+                    var elems = new $c_sjs_js_WrappedArray().init___sjs_js_Array(array);
+                    this$15.insertAll__I__sc_Traversable__V(n, elems);
+                    elem$1$1 = true;
+                    elem$1$2 = ((1 + elem$1$2) | 0)
+                  } else if ((($as_T(elem$1$3) === ">>") || ($as_T(elem$1$3) === "[]>>"))) {
+                    var ets_new = new $c_Lmain_scala_EnabledTaskSet().init___();
+                    var enabledTasksLeftUp = child.findTaskLeftUp__scm_ListBuffer();
+                    var xs = ets_new.tasks$1;
+                    var this$16 = new $c_scm_ListBuffer().init___().$$plus$plus$eq__sc_TraversableOnce__scm_ListBuffer(enabledTasksLeftUp);
+                    ets_new.tasks$1 = this$16.$$plus$plus$eq__sc_TraversableOnce__scm_ListBuffer(xs);
+                    ets_new.tasks$1.$$plus$eq__O__scm_ListBuffer(child);
+                    var enabledTasksRightUp = child.findTaskRightUp__scm_ListBuffer();
+                    var this$17 = enabledTasksRightUp.scala$collection$mutable$ListBuffer$$start$6;
+                    var these$1 = this$17;
+                    while ((!these$1.isEmpty__Z())) {
+                      var arg1$1 = these$1.head__O();
+                      var t = $as_Lmain_scala_CttNode(arg1$1);
+                      ets_new.tasks$1.$$plus$eq__O__scm_ListBuffer(t);
+                      these$1 = $as_sci_List(these$1.tail__O())
+                    };
+                    $as_Lmain_scala_EnabledTaskSets(elem$1).sets$1.$$plus$eq__O__scm_ListBuffer(ets_new);
+                    elem$1$1 = true
+                  }
                 };
-                $as_Lmain_scala_EnabledTaskSets(elem$1).sets$1.$$plus$eq__O__scm_ListBuffer(ets_new)
+                these = $as_sci_List(these.tail__O())
               };
-              these = $as_sci_List(these.tail__O())
+              elem$1$2 = (((-1) + elem$1$2) | 0)
             };
-            elem$1$1 = (((-1) + elem$1$1) | 0)
-          };
-          elem$1$1 = ((1 + elem$1$1) | 0)
-        } else {
+            elem$1$2 = ((1 + elem$1$2) | 0)
+          } else {
+            break
+          }
+        };
+        if ((i === scala$collection$immutable$Range$$lastElement$4)) {
           break
-        }
-      };
-      if ((i === scala$collection$immutable$Range$$lastElement$4)) {
-        break
-      };
-      i = ((1 + i) | 0)
-    }
-  };
-  var this$21 = $as_Lmain_scala_EnabledTaskSets(elem$1).sets$1;
-  var etss_len$1 = this$21.len$6;
-  var isEmpty$4$1 = (etss_len$1 <= 0);
-  var scala$collection$immutable$Range$$lastElement$4$1 = (((-1) + etss_len$1) | 0);
-  if ((!isEmpty$4$1)) {
-    var i$1 = 0;
-    while (true) {
-      var v1$1 = i$1;
-      var ets$2 = $as_Lmain_scala_EnabledTaskSet($as_Lmain_scala_EnabledTaskSets(elem$1).sets$1.apply__I__O(v1$1));
-      var this$26 = $m_s_Console$();
-      var this$27 = $as_Ljava_io_PrintStream(this$26.outVar$2.v$1);
-      this$27.java$lang$JSConsoleBasedPrintStream$$printString__T__V("Enabled task set\n");
-      var elem$1$3 = 0;
-      elem$1$3 = 0;
-      while (true) {
-        var jsx$2 = elem$1$3;
-        var this$29 = ets$2.tasks$1;
-        if ((jsx$2 < this$29.len$6)) {
-          var task$1 = $as_Lmain_scala_CttNode(ets$2.tasks$1.apply__I__O(elem$1$3));
-          var x$1 = ((("  task: " + task$1) + "  j: ") + elem$1$3);
-          var this$31 = $m_s_Console$();
-          var this$32 = $as_Ljava_io_PrintStream(this$31.outVar$2.v$1);
-          this$32.java$lang$JSConsoleBasedPrintStream$$printString__T__V((x$1 + "\n"));
-          var this$33 = task$1.children$1;
-          if ((this$33.len$6 > 0)) {
-            ets$2.tasks$1.remove__I__O(elem$1$3);
-            var elem$1$4 = null;
-            elem$1$4 = "";
-            var this$35 = task$1.children$1;
-            var this$36 = this$35.scala$collection$mutable$ListBuffer$$start$6;
-            var these$1 = this$36;
-            while ((!these$1.isEmpty__Z())) {
-              var arg1$1 = these$1.head__O();
-              var child$1 = $as_Lmain_scala_CttNode(arg1$1);
-              if ((child$1.Operator__Lmain_scala_CttOperator() !== null)) {
-                elem$1$4 = child$1.Operator__Lmain_scala_CttOperator().name$1
-              } else if ((((((((($as_T(elem$1$4) === "") || ($as_T(elem$1$4) === "[]")) || ($as_T(elem$1$4) === "|=|")) || ($as_T(elem$1$4) === "||")) || ($as_T(elem$1$4) === "|||")) || ($as_T(elem$1$4) === "|[]|")) || ($as_T(elem$1$4) === "[>")) || ($as_T(elem$1$4) === "|>"))) {
-                var this$39 = ets$2.tasks$1;
-                var n$1 = elem$1$3;
-                var array$1 = [child$1];
-                var elems$1 = new $c_sjs_js_WrappedArray().init___sjs_js_Array(array$1);
-                this$39.insertAll__I__sc_Traversable__V(n$1, elems$1);
-                elem$1$3 = ((1 + elem$1$3) | 0)
-              } else if ((($as_T(elem$1$4) === ">>") || ($as_T(elem$1$4) === "[]>>"))) {
-                var ets_new$1 = new $c_Lmain_scala_EnabledTaskSet().init___();
-                ets_new$1.tasks$1.$$plus$eq__O__scm_ListBuffer(child$1);
-                var desactivationTask$1 = child$1.findDesactivationTaskRightUp__Lmain_scala_CttNode();
-                if ((desactivationTask$1 !== null)) {
-                  ets_new$1.tasks$1.$$plus$eq__O__scm_ListBuffer(desactivationTask$1)
-                };
-                $as_Lmain_scala_EnabledTaskSets(elem$1).sets$1.$$plus$eq__O__scm_ListBuffer(ets_new$1)
-              };
-              these$1 = $as_sci_List(these$1.tail__O())
-            };
-            elem$1$3 = (((-1) + elem$1$3) | 0)
-          };
-          elem$1$3 = ((1 + elem$1$3) | 0)
-        } else {
-          break
-        }
-      };
-      if ((i$1 === scala$collection$immutable$Range$$lastElement$4$1)) {
-        break
-      };
-      i$1 = ((1 + i$1) | 0)
-    }
-  };
-  var this$40 = $as_Lmain_scala_EnabledTaskSets(elem$1).sets$1;
-  var etss_len$2 = this$40.len$6;
-  var isEmpty$4$2 = (etss_len$2 <= 0);
-  var scala$collection$immutable$Range$$lastElement$4$2 = (((-1) + etss_len$2) | 0);
-  if ((!isEmpty$4$2)) {
-    var i$2 = 0;
-    while (true) {
-      var v1$2 = i$2;
-      var ets$3 = $as_Lmain_scala_EnabledTaskSet($as_Lmain_scala_EnabledTaskSets(elem$1).sets$1.apply__I__O(v1$2));
-      var this$45 = $m_s_Console$();
-      var this$46 = $as_Ljava_io_PrintStream(this$45.outVar$2.v$1);
-      this$46.java$lang$JSConsoleBasedPrintStream$$printString__T__V("Enabled task set\n");
-      var elem$1$5 = 0;
-      elem$1$5 = 0;
-      while (true) {
-        var jsx$3 = elem$1$5;
-        var this$48 = ets$3.tasks$1;
-        if ((jsx$3 < this$48.len$6)) {
-          var task$2 = $as_Lmain_scala_CttNode(ets$3.tasks$1.apply__I__O(elem$1$5));
-          var x$2 = ((("  task: " + task$2) + "  j: ") + elem$1$5);
-          var this$50 = $m_s_Console$();
-          var this$51 = $as_Ljava_io_PrintStream(this$50.outVar$2.v$1);
-          this$51.java$lang$JSConsoleBasedPrintStream$$printString__T__V((x$2 + "\n"));
-          var this$52 = task$2.children$1;
-          if ((this$52.len$6 > 0)) {
-            ets$3.tasks$1.remove__I__O(elem$1$5);
-            var elem$1$6 = null;
-            elem$1$6 = "";
-            var this$54 = task$2.children$1;
-            var this$55 = this$54.scala$collection$mutable$ListBuffer$$start$6;
-            var these$2 = this$55;
-            while ((!these$2.isEmpty__Z())) {
-              var arg1$2 = these$2.head__O();
-              var child$2 = $as_Lmain_scala_CttNode(arg1$2);
-              if ((child$2.Operator__Lmain_scala_CttOperator() !== null)) {
-                elem$1$6 = child$2.Operator__Lmain_scala_CttOperator().name$1
-              } else if ((((((((($as_T(elem$1$6) === "") || ($as_T(elem$1$6) === "[]")) || ($as_T(elem$1$6) === "|=|")) || ($as_T(elem$1$6) === "||")) || ($as_T(elem$1$6) === "|||")) || ($as_T(elem$1$6) === "|[]|")) || ($as_T(elem$1$6) === "[>")) || ($as_T(elem$1$6) === "|>"))) {
-                var this$58 = ets$3.tasks$1;
-                var n$2 = elem$1$5;
-                var array$2 = [child$2];
-                var elems$2 = new $c_sjs_js_WrappedArray().init___sjs_js_Array(array$2);
-                this$58.insertAll__I__sc_Traversable__V(n$2, elems$2);
-                elem$1$5 = ((1 + elem$1$5) | 0)
-              } else if ((($as_T(elem$1$6) === ">>") || ($as_T(elem$1$6) === "[]>>"))) {
-                var ets_new$2 = new $c_Lmain_scala_EnabledTaskSet().init___();
-                ets_new$2.tasks$1.$$plus$eq__O__scm_ListBuffer(child$2);
-                var desactivationTask$2 = child$2.findDesactivationTaskRightUp__Lmain_scala_CttNode();
-                if ((desactivationTask$2 !== null)) {
-                  ets_new$2.tasks$1.$$plus$eq__O__scm_ListBuffer(desactivationTask$2)
-                };
-                $as_Lmain_scala_EnabledTaskSets(elem$1).sets$1.$$plus$eq__O__scm_ListBuffer(ets_new$2)
-              };
-              these$2 = $as_sci_List(these$2.tail__O())
-            };
-            elem$1$5 = (((-1) + elem$1$5) | 0)
-          };
-          elem$1$5 = ((1 + elem$1$5) | 0)
-        } else {
-          break
-        }
-      };
-      if ((i$2 === scala$collection$immutable$Range$$lastElement$4$2)) {
-        break
-      };
-      i$2 = ((1 + i$2) | 0)
-    }
-  };
-  var this$59 = $as_Lmain_scala_EnabledTaskSets(elem$1).sets$1;
-  var etss_len$3 = this$59.len$6;
-  var isEmpty$4$3 = (etss_len$3 <= 0);
-  var scala$collection$immutable$Range$$lastElement$4$3 = (((-1) + etss_len$3) | 0);
-  if ((!isEmpty$4$3)) {
-    var i$3 = 0;
-    while (true) {
-      var v1$3 = i$3;
-      var ets$4 = $as_Lmain_scala_EnabledTaskSet($as_Lmain_scala_EnabledTaskSets(elem$1).sets$1.apply__I__O(v1$3));
-      var this$64 = $m_s_Console$();
-      var this$65 = $as_Ljava_io_PrintStream(this$64.outVar$2.v$1);
-      this$65.java$lang$JSConsoleBasedPrintStream$$printString__T__V("Enabled task set\n");
-      var elem$1$7 = 0;
-      elem$1$7 = 0;
-      while (true) {
-        var jsx$4 = elem$1$7;
-        var this$67 = ets$4.tasks$1;
-        if ((jsx$4 < this$67.len$6)) {
-          var task$3 = $as_Lmain_scala_CttNode(ets$4.tasks$1.apply__I__O(elem$1$7));
-          var x$3 = ((("  task: " + task$3) + "  j: ") + elem$1$7);
-          var this$69 = $m_s_Console$();
-          var this$70 = $as_Ljava_io_PrintStream(this$69.outVar$2.v$1);
-          this$70.java$lang$JSConsoleBasedPrintStream$$printString__T__V((x$3 + "\n"));
-          var this$71 = task$3.children$1;
-          if ((this$71.len$6 > 0)) {
-            ets$4.tasks$1.remove__I__O(elem$1$7);
-            var elem$1$8 = null;
-            elem$1$8 = "";
-            var this$73 = task$3.children$1;
-            var this$74 = this$73.scala$collection$mutable$ListBuffer$$start$6;
-            var these$3 = this$74;
-            while ((!these$3.isEmpty__Z())) {
-              var arg1$3 = these$3.head__O();
-              var child$3 = $as_Lmain_scala_CttNode(arg1$3);
-              if ((child$3.Operator__Lmain_scala_CttOperator() !== null)) {
-                elem$1$8 = child$3.Operator__Lmain_scala_CttOperator().name$1
-              } else if ((((((((($as_T(elem$1$8) === "") || ($as_T(elem$1$8) === "[]")) || ($as_T(elem$1$8) === "|=|")) || ($as_T(elem$1$8) === "||")) || ($as_T(elem$1$8) === "|||")) || ($as_T(elem$1$8) === "|[]|")) || ($as_T(elem$1$8) === "[>")) || ($as_T(elem$1$8) === "|>"))) {
-                var this$77 = ets$4.tasks$1;
-                var n$3 = elem$1$7;
-                var array$3 = [child$3];
-                var elems$3 = new $c_sjs_js_WrappedArray().init___sjs_js_Array(array$3);
-                this$77.insertAll__I__sc_Traversable__V(n$3, elems$3);
-                elem$1$7 = ((1 + elem$1$7) | 0)
-              } else if ((($as_T(elem$1$8) === ">>") || ($as_T(elem$1$8) === "[]>>"))) {
-                var ets_new$3 = new $c_Lmain_scala_EnabledTaskSet().init___();
-                ets_new$3.tasks$1.$$plus$eq__O__scm_ListBuffer(child$3);
-                var desactivationTask$3 = child$3.findDesactivationTaskRightUp__Lmain_scala_CttNode();
-                if ((desactivationTask$3 !== null)) {
-                  ets_new$3.tasks$1.$$plus$eq__O__scm_ListBuffer(desactivationTask$3)
-                };
-                $as_Lmain_scala_EnabledTaskSets(elem$1).sets$1.$$plus$eq__O__scm_ListBuffer(ets_new$3)
-              };
-              these$3 = $as_sci_List(these$3.tail__O())
-            };
-            elem$1$7 = (((-1) + elem$1$7) | 0)
-          };
-          elem$1$7 = ((1 + elem$1$7) | 0)
-        } else {
-          break
-        }
-      };
-      if ((i$3 === scala$collection$immutable$Range$$lastElement$4$3)) {
-        break
-      };
-      i$3 = ((1 + i$3) | 0)
-    }
-  };
-  var this$78 = $as_Lmain_scala_EnabledTaskSets(elem$1).sets$1;
-  var etss_len$4 = this$78.len$6;
-  var isEmpty$4$4 = (etss_len$4 <= 0);
-  var scala$collection$immutable$Range$$lastElement$4$4 = (((-1) + etss_len$4) | 0);
-  if ((!isEmpty$4$4)) {
-    var i$4 = 0;
-    while (true) {
-      var v1$4 = i$4;
-      var ets$5 = $as_Lmain_scala_EnabledTaskSet($as_Lmain_scala_EnabledTaskSets(elem$1).sets$1.apply__I__O(v1$4));
-      var this$83 = $m_s_Console$();
-      var this$84 = $as_Ljava_io_PrintStream(this$83.outVar$2.v$1);
-      this$84.java$lang$JSConsoleBasedPrintStream$$printString__T__V("Enabled task set\n");
-      var elem$1$9 = 0;
-      elem$1$9 = 0;
-      while (true) {
-        var jsx$5 = elem$1$9;
-        var this$86 = ets$5.tasks$1;
-        if ((jsx$5 < this$86.len$6)) {
-          var task$4 = $as_Lmain_scala_CttNode(ets$5.tasks$1.apply__I__O(elem$1$9));
-          var x$4 = ((("  task: " + task$4) + "  j: ") + elem$1$9);
-          var this$88 = $m_s_Console$();
-          var this$89 = $as_Ljava_io_PrintStream(this$88.outVar$2.v$1);
-          this$89.java$lang$JSConsoleBasedPrintStream$$printString__T__V((x$4 + "\n"));
-          var this$90 = task$4.children$1;
-          if ((this$90.len$6 > 0)) {
-            ets$5.tasks$1.remove__I__O(elem$1$9);
-            var elem$1$10 = null;
-            elem$1$10 = "";
-            var this$92 = task$4.children$1;
-            var this$93 = this$92.scala$collection$mutable$ListBuffer$$start$6;
-            var these$4 = this$93;
-            while ((!these$4.isEmpty__Z())) {
-              var arg1$4 = these$4.head__O();
-              var child$4 = $as_Lmain_scala_CttNode(arg1$4);
-              if ((child$4.Operator__Lmain_scala_CttOperator() !== null)) {
-                elem$1$10 = child$4.Operator__Lmain_scala_CttOperator().name$1
-              } else if ((((((((($as_T(elem$1$10) === "") || ($as_T(elem$1$10) === "[]")) || ($as_T(elem$1$10) === "|=|")) || ($as_T(elem$1$10) === "||")) || ($as_T(elem$1$10) === "|||")) || ($as_T(elem$1$10) === "|[]|")) || ($as_T(elem$1$10) === "[>")) || ($as_T(elem$1$10) === "|>"))) {
-                var this$96 = ets$5.tasks$1;
-                var n$4 = elem$1$9;
-                var array$4 = [child$4];
-                var elems$4 = new $c_sjs_js_WrappedArray().init___sjs_js_Array(array$4);
-                this$96.insertAll__I__sc_Traversable__V(n$4, elems$4);
-                elem$1$9 = ((1 + elem$1$9) | 0)
-              } else if ((($as_T(elem$1$10) === ">>") || ($as_T(elem$1$10) === "[]>>"))) {
-                var ets_new$4 = new $c_Lmain_scala_EnabledTaskSet().init___();
-                ets_new$4.tasks$1.$$plus$eq__O__scm_ListBuffer(child$4);
-                var desactivationTask$4 = child$4.findDesactivationTaskRightUp__Lmain_scala_CttNode();
-                if ((desactivationTask$4 !== null)) {
-                  ets_new$4.tasks$1.$$plus$eq__O__scm_ListBuffer(desactivationTask$4)
-                };
-                $as_Lmain_scala_EnabledTaskSets(elem$1).sets$1.$$plus$eq__O__scm_ListBuffer(ets_new$4)
-              };
-              these$4 = $as_sci_List(these$4.tail__O())
-            };
-            elem$1$9 = (((-1) + elem$1$9) | 0)
-          };
-          elem$1$9 = ((1 + elem$1$9) | 0)
-        } else {
-          break
-        }
-      };
-      if ((i$4 === scala$collection$immutable$Range$$lastElement$4$4)) {
-        break
-      };
-      i$4 = ((1 + i$4) | 0)
-    }
-  };
-  var this$97 = $as_Lmain_scala_EnabledTaskSets(elem$1).sets$1;
-  var etss_len$5 = this$97.len$6;
-  var isEmpty$4$5 = (etss_len$5 <= 0);
-  var scala$collection$immutable$Range$$lastElement$4$5 = (((-1) + etss_len$5) | 0);
-  if ((!isEmpty$4$5)) {
-    var i$5 = 0;
-    while (true) {
-      var v1$5 = i$5;
-      var ets$6 = $as_Lmain_scala_EnabledTaskSet($as_Lmain_scala_EnabledTaskSets(elem$1).sets$1.apply__I__O(v1$5));
-      var this$102 = $m_s_Console$();
-      var this$103 = $as_Ljava_io_PrintStream(this$102.outVar$2.v$1);
-      this$103.java$lang$JSConsoleBasedPrintStream$$printString__T__V("Enabled task set\n");
-      var elem$1$11 = 0;
-      elem$1$11 = 0;
-      while (true) {
-        var jsx$6 = elem$1$11;
-        var this$105 = ets$6.tasks$1;
-        if ((jsx$6 < this$105.len$6)) {
-          var task$5 = $as_Lmain_scala_CttNode(ets$6.tasks$1.apply__I__O(elem$1$11));
-          var x$5 = ((("  task: " + task$5) + "  j: ") + elem$1$11);
-          var this$107 = $m_s_Console$();
-          var this$108 = $as_Ljava_io_PrintStream(this$107.outVar$2.v$1);
-          this$108.java$lang$JSConsoleBasedPrintStream$$printString__T__V((x$5 + "\n"));
-          var this$109 = task$5.children$1;
-          if ((this$109.len$6 > 0)) {
-            ets$6.tasks$1.remove__I__O(elem$1$11);
-            var elem$1$12 = null;
-            elem$1$12 = "";
-            var this$111 = task$5.children$1;
-            var this$112 = this$111.scala$collection$mutable$ListBuffer$$start$6;
-            var these$5 = this$112;
-            while ((!these$5.isEmpty__Z())) {
-              var arg1$5 = these$5.head__O();
-              var child$5 = $as_Lmain_scala_CttNode(arg1$5);
-              if ((child$5.Operator__Lmain_scala_CttOperator() !== null)) {
-                elem$1$12 = child$5.Operator__Lmain_scala_CttOperator().name$1
-              } else if ((((((((($as_T(elem$1$12) === "") || ($as_T(elem$1$12) === "[]")) || ($as_T(elem$1$12) === "|=|")) || ($as_T(elem$1$12) === "||")) || ($as_T(elem$1$12) === "|||")) || ($as_T(elem$1$12) === "|[]|")) || ($as_T(elem$1$12) === "[>")) || ($as_T(elem$1$12) === "|>"))) {
-                var this$115 = ets$6.tasks$1;
-                var n$5 = elem$1$11;
-                var array$5 = [child$5];
-                var elems$5 = new $c_sjs_js_WrappedArray().init___sjs_js_Array(array$5);
-                this$115.insertAll__I__sc_Traversable__V(n$5, elems$5);
-                elem$1$11 = ((1 + elem$1$11) | 0)
-              } else if ((($as_T(elem$1$12) === ">>") || ($as_T(elem$1$12) === "[]>>"))) {
-                var ets_new$5 = new $c_Lmain_scala_EnabledTaskSet().init___();
-                ets_new$5.tasks$1.$$plus$eq__O__scm_ListBuffer(child$5);
-                var desactivationTask$5 = child$5.findDesactivationTaskRightUp__Lmain_scala_CttNode();
-                if ((desactivationTask$5 !== null)) {
-                  ets_new$5.tasks$1.$$plus$eq__O__scm_ListBuffer(desactivationTask$5)
-                };
-                $as_Lmain_scala_EnabledTaskSets(elem$1).sets$1.$$plus$eq__O__scm_ListBuffer(ets_new$5)
-              };
-              these$5 = $as_sci_List(these$5.tail__O())
-            };
-            elem$1$11 = (((-1) + elem$1$11) | 0)
-          };
-          elem$1$11 = ((1 + elem$1$11) | 0)
-        } else {
-          break
-        }
-      };
-      if ((i$5 === scala$collection$immutable$Range$$lastElement$4$5)) {
-        break
-      };
-      i$5 = ((1 + i$5) | 0)
-    }
-  };
-  var this$116 = $as_Lmain_scala_EnabledTaskSets(elem$1).sets$1;
-  var etss_len$6 = this$116.len$6;
-  var isEmpty$4$6 = (etss_len$6 <= 0);
-  var scala$collection$immutable$Range$$lastElement$4$6 = (((-1) + etss_len$6) | 0);
-  if ((!isEmpty$4$6)) {
-    var i$6 = 0;
-    while (true) {
-      var v1$6 = i$6;
-      var ets$7 = $as_Lmain_scala_EnabledTaskSet($as_Lmain_scala_EnabledTaskSets(elem$1).sets$1.apply__I__O(v1$6));
-      var this$121 = $m_s_Console$();
-      var this$122 = $as_Ljava_io_PrintStream(this$121.outVar$2.v$1);
-      this$122.java$lang$JSConsoleBasedPrintStream$$printString__T__V("Enabled task set\n");
-      var elem$1$13 = 0;
-      elem$1$13 = 0;
-      while (true) {
-        var jsx$7 = elem$1$13;
-        var this$124 = ets$7.tasks$1;
-        if ((jsx$7 < this$124.len$6)) {
-          var task$6 = $as_Lmain_scala_CttNode(ets$7.tasks$1.apply__I__O(elem$1$13));
-          var x$6 = ((("  task: " + task$6) + "  j: ") + elem$1$13);
-          var this$126 = $m_s_Console$();
-          var this$127 = $as_Ljava_io_PrintStream(this$126.outVar$2.v$1);
-          this$127.java$lang$JSConsoleBasedPrintStream$$printString__T__V((x$6 + "\n"));
-          var this$128 = task$6.children$1;
-          if ((this$128.len$6 > 0)) {
-            ets$7.tasks$1.remove__I__O(elem$1$13);
-            var elem$1$14 = null;
-            elem$1$14 = "";
-            var this$130 = task$6.children$1;
-            var this$131 = this$130.scala$collection$mutable$ListBuffer$$start$6;
-            var these$6 = this$131;
-            while ((!these$6.isEmpty__Z())) {
-              var arg1$6 = these$6.head__O();
-              var child$6 = $as_Lmain_scala_CttNode(arg1$6);
-              if ((child$6.Operator__Lmain_scala_CttOperator() !== null)) {
-                elem$1$14 = child$6.Operator__Lmain_scala_CttOperator().name$1
-              } else if ((((((((($as_T(elem$1$14) === "") || ($as_T(elem$1$14) === "[]")) || ($as_T(elem$1$14) === "|=|")) || ($as_T(elem$1$14) === "||")) || ($as_T(elem$1$14) === "|||")) || ($as_T(elem$1$14) === "|[]|")) || ($as_T(elem$1$14) === "[>")) || ($as_T(elem$1$14) === "|>"))) {
-                var this$134 = ets$7.tasks$1;
-                var n$6 = elem$1$13;
-                var array$6 = [child$6];
-                var elems$6 = new $c_sjs_js_WrappedArray().init___sjs_js_Array(array$6);
-                this$134.insertAll__I__sc_Traversable__V(n$6, elems$6);
-                elem$1$13 = ((1 + elem$1$13) | 0)
-              } else if ((($as_T(elem$1$14) === ">>") || ($as_T(elem$1$14) === "[]>>"))) {
-                var ets_new$6 = new $c_Lmain_scala_EnabledTaskSet().init___();
-                ets_new$6.tasks$1.$$plus$eq__O__scm_ListBuffer(child$6);
-                var desactivationTask$6 = child$6.findDesactivationTaskRightUp__Lmain_scala_CttNode();
-                if ((desactivationTask$6 !== null)) {
-                  ets_new$6.tasks$1.$$plus$eq__O__scm_ListBuffer(desactivationTask$6)
-                };
-                $as_Lmain_scala_EnabledTaskSets(elem$1).sets$1.$$plus$eq__O__scm_ListBuffer(ets_new$6)
-              };
-              these$6 = $as_sci_List(these$6.tail__O())
-            };
-            elem$1$13 = (((-1) + elem$1$13) | 0)
-          };
-          elem$1$13 = ((1 + elem$1$13) | 0)
-        } else {
-          break
-        }
-      };
-      if ((i$6 === scala$collection$immutable$Range$$lastElement$4$6)) {
-        break
-      };
-      i$6 = ((1 + i$6) | 0)
-    }
-  };
-  var this$135 = $as_Lmain_scala_EnabledTaskSets(elem$1).sets$1;
-  var etss_len$7 = this$135.len$6;
-  var isEmpty$4$7 = (etss_len$7 <= 0);
-  var scala$collection$immutable$Range$$lastElement$4$7 = (((-1) + etss_len$7) | 0);
-  if ((!isEmpty$4$7)) {
-    var i$7 = 0;
-    while (true) {
-      var v1$7 = i$7;
-      var ets$8 = $as_Lmain_scala_EnabledTaskSet($as_Lmain_scala_EnabledTaskSets(elem$1).sets$1.apply__I__O(v1$7));
-      var this$140 = $m_s_Console$();
-      var this$141 = $as_Ljava_io_PrintStream(this$140.outVar$2.v$1);
-      this$141.java$lang$JSConsoleBasedPrintStream$$printString__T__V("Enabled task set\n");
-      var elem$1$15 = 0;
-      elem$1$15 = 0;
-      while (true) {
-        var jsx$8 = elem$1$15;
-        var this$143 = ets$8.tasks$1;
-        if ((jsx$8 < this$143.len$6)) {
-          var task$7 = $as_Lmain_scala_CttNode(ets$8.tasks$1.apply__I__O(elem$1$15));
-          var x$7 = ((("  task: " + task$7) + "  j: ") + elem$1$15);
-          var this$145 = $m_s_Console$();
-          var this$146 = $as_Ljava_io_PrintStream(this$145.outVar$2.v$1);
-          this$146.java$lang$JSConsoleBasedPrintStream$$printString__T__V((x$7 + "\n"));
-          var this$147 = task$7.children$1;
-          if ((this$147.len$6 > 0)) {
-            ets$8.tasks$1.remove__I__O(elem$1$15);
-            var elem$1$16 = null;
-            elem$1$16 = "";
-            var this$149 = task$7.children$1;
-            var this$150 = this$149.scala$collection$mutable$ListBuffer$$start$6;
-            var these$7 = this$150;
-            while ((!these$7.isEmpty__Z())) {
-              var arg1$7 = these$7.head__O();
-              var child$7 = $as_Lmain_scala_CttNode(arg1$7);
-              if ((child$7.Operator__Lmain_scala_CttOperator() !== null)) {
-                elem$1$16 = child$7.Operator__Lmain_scala_CttOperator().name$1
-              } else if ((((((((($as_T(elem$1$16) === "") || ($as_T(elem$1$16) === "[]")) || ($as_T(elem$1$16) === "|=|")) || ($as_T(elem$1$16) === "||")) || ($as_T(elem$1$16) === "|||")) || ($as_T(elem$1$16) === "|[]|")) || ($as_T(elem$1$16) === "[>")) || ($as_T(elem$1$16) === "|>"))) {
-                var this$153 = ets$8.tasks$1;
-                var n$7 = elem$1$15;
-                var array$7 = [child$7];
-                var elems$7 = new $c_sjs_js_WrappedArray().init___sjs_js_Array(array$7);
-                this$153.insertAll__I__sc_Traversable__V(n$7, elems$7);
-                elem$1$15 = ((1 + elem$1$15) | 0)
-              } else if ((($as_T(elem$1$16) === ">>") || ($as_T(elem$1$16) === "[]>>"))) {
-                var ets_new$7 = new $c_Lmain_scala_EnabledTaskSet().init___();
-                ets_new$7.tasks$1.$$plus$eq__O__scm_ListBuffer(child$7);
-                var desactivationTask$7 = child$7.findDesactivationTaskRightUp__Lmain_scala_CttNode();
-                if ((desactivationTask$7 !== null)) {
-                  ets_new$7.tasks$1.$$plus$eq__O__scm_ListBuffer(desactivationTask$7)
-                };
-                $as_Lmain_scala_EnabledTaskSets(elem$1).sets$1.$$plus$eq__O__scm_ListBuffer(ets_new$7)
-              };
-              these$7 = $as_sci_List(these$7.tail__O())
-            };
-            elem$1$15 = (((-1) + elem$1$15) | 0)
-          };
-          elem$1$15 = ((1 + elem$1$15) | 0)
-        } else {
-          break
-        }
-      };
-      if ((i$7 === scala$collection$immutable$Range$$lastElement$4$7)) {
-        break
-      };
-      i$7 = ((1 + i$7) | 0)
-    }
-  };
-  var this$154 = $as_Lmain_scala_EnabledTaskSets(elem$1).sets$1;
-  var etss_len$8 = this$154.len$6;
-  var isEmpty$4$8 = (etss_len$8 <= 0);
-  var scala$collection$immutable$Range$$lastElement$4$8 = (((-1) + etss_len$8) | 0);
-  if ((!isEmpty$4$8)) {
-    var i$8 = 0;
-    while (true) {
-      var v1$8 = i$8;
-      var ets$9 = $as_Lmain_scala_EnabledTaskSet($as_Lmain_scala_EnabledTaskSets(elem$1).sets$1.apply__I__O(v1$8));
-      var this$159 = $m_s_Console$();
-      var this$160 = $as_Ljava_io_PrintStream(this$159.outVar$2.v$1);
-      this$160.java$lang$JSConsoleBasedPrintStream$$printString__T__V("Enabled task set\n");
-      var elem$1$17 = 0;
-      elem$1$17 = 0;
-      while (true) {
-        var jsx$9 = elem$1$17;
-        var this$162 = ets$9.tasks$1;
-        if ((jsx$9 < this$162.len$6)) {
-          var task$8 = $as_Lmain_scala_CttNode(ets$9.tasks$1.apply__I__O(elem$1$17));
-          var x$8 = ((("  task: " + task$8) + "  j: ") + elem$1$17);
-          var this$164 = $m_s_Console$();
-          var this$165 = $as_Ljava_io_PrintStream(this$164.outVar$2.v$1);
-          this$165.java$lang$JSConsoleBasedPrintStream$$printString__T__V((x$8 + "\n"));
-          var this$166 = task$8.children$1;
-          if ((this$166.len$6 > 0)) {
-            ets$9.tasks$1.remove__I__O(elem$1$17);
-            var elem$1$18 = null;
-            elem$1$18 = "";
-            var this$168 = task$8.children$1;
-            var this$169 = this$168.scala$collection$mutable$ListBuffer$$start$6;
-            var these$8 = this$169;
-            while ((!these$8.isEmpty__Z())) {
-              var arg1$8 = these$8.head__O();
-              var child$8 = $as_Lmain_scala_CttNode(arg1$8);
-              if ((child$8.Operator__Lmain_scala_CttOperator() !== null)) {
-                elem$1$18 = child$8.Operator__Lmain_scala_CttOperator().name$1
-              } else if ((((((((($as_T(elem$1$18) === "") || ($as_T(elem$1$18) === "[]")) || ($as_T(elem$1$18) === "|=|")) || ($as_T(elem$1$18) === "||")) || ($as_T(elem$1$18) === "|||")) || ($as_T(elem$1$18) === "|[]|")) || ($as_T(elem$1$18) === "[>")) || ($as_T(elem$1$18) === "|>"))) {
-                var this$172 = ets$9.tasks$1;
-                var n$8 = elem$1$17;
-                var array$8 = [child$8];
-                var elems$8 = new $c_sjs_js_WrappedArray().init___sjs_js_Array(array$8);
-                this$172.insertAll__I__sc_Traversable__V(n$8, elems$8);
-                elem$1$17 = ((1 + elem$1$17) | 0)
-              } else if ((($as_T(elem$1$18) === ">>") || ($as_T(elem$1$18) === "[]>>"))) {
-                var ets_new$8 = new $c_Lmain_scala_EnabledTaskSet().init___();
-                ets_new$8.tasks$1.$$plus$eq__O__scm_ListBuffer(child$8);
-                var desactivationTask$8 = child$8.findDesactivationTaskRightUp__Lmain_scala_CttNode();
-                if ((desactivationTask$8 !== null)) {
-                  ets_new$8.tasks$1.$$plus$eq__O__scm_ListBuffer(desactivationTask$8)
-                };
-                $as_Lmain_scala_EnabledTaskSets(elem$1).sets$1.$$plus$eq__O__scm_ListBuffer(ets_new$8)
-              };
-              these$8 = $as_sci_List(these$8.tail__O())
-            };
-            elem$1$17 = (((-1) + elem$1$17) | 0)
-          };
-          elem$1$17 = ((1 + elem$1$17) | 0)
-        } else {
-          break
-        }
-      };
-      if ((i$8 === scala$collection$immutable$Range$$lastElement$4$8)) {
-        break
-      };
-      i$8 = ((1 + i$8) | 0)
-    }
-  };
-  var this$173 = $as_Lmain_scala_EnabledTaskSets(elem$1).sets$1;
-  var etss_len$9 = this$173.len$6;
-  var isEmpty$4$9 = (etss_len$9 <= 0);
-  var scala$collection$immutable$Range$$lastElement$4$9 = (((-1) + etss_len$9) | 0);
-  if ((!isEmpty$4$9)) {
-    var i$9 = 0;
-    while (true) {
-      var v1$9 = i$9;
-      var ets$10 = $as_Lmain_scala_EnabledTaskSet($as_Lmain_scala_EnabledTaskSets(elem$1).sets$1.apply__I__O(v1$9));
-      var this$178 = $m_s_Console$();
-      var this$179 = $as_Ljava_io_PrintStream(this$178.outVar$2.v$1);
-      this$179.java$lang$JSConsoleBasedPrintStream$$printString__T__V("Enabled task set\n");
-      var elem$1$19 = 0;
-      elem$1$19 = 0;
-      while (true) {
-        var jsx$10 = elem$1$19;
-        var this$181 = ets$10.tasks$1;
-        if ((jsx$10 < this$181.len$6)) {
-          var task$9 = $as_Lmain_scala_CttNode(ets$10.tasks$1.apply__I__O(elem$1$19));
-          var x$9 = ((("  task: " + task$9) + "  j: ") + elem$1$19);
-          var this$183 = $m_s_Console$();
-          var this$184 = $as_Ljava_io_PrintStream(this$183.outVar$2.v$1);
-          this$184.java$lang$JSConsoleBasedPrintStream$$printString__T__V((x$9 + "\n"));
-          var this$185 = task$9.children$1;
-          if ((this$185.len$6 > 0)) {
-            ets$10.tasks$1.remove__I__O(elem$1$19);
-            var elem$1$20 = null;
-            elem$1$20 = "";
-            var this$187 = task$9.children$1;
-            var this$188 = this$187.scala$collection$mutable$ListBuffer$$start$6;
-            var these$9 = this$188;
-            while ((!these$9.isEmpty__Z())) {
-              var arg1$9 = these$9.head__O();
-              var child$9 = $as_Lmain_scala_CttNode(arg1$9);
-              if ((child$9.Operator__Lmain_scala_CttOperator() !== null)) {
-                elem$1$20 = child$9.Operator__Lmain_scala_CttOperator().name$1
-              } else if ((((((((($as_T(elem$1$20) === "") || ($as_T(elem$1$20) === "[]")) || ($as_T(elem$1$20) === "|=|")) || ($as_T(elem$1$20) === "||")) || ($as_T(elem$1$20) === "|||")) || ($as_T(elem$1$20) === "|[]|")) || ($as_T(elem$1$20) === "[>")) || ($as_T(elem$1$20) === "|>"))) {
-                var this$191 = ets$10.tasks$1;
-                var n$9 = elem$1$19;
-                var array$9 = [child$9];
-                var elems$9 = new $c_sjs_js_WrappedArray().init___sjs_js_Array(array$9);
-                this$191.insertAll__I__sc_Traversable__V(n$9, elems$9);
-                elem$1$19 = ((1 + elem$1$19) | 0)
-              } else if ((($as_T(elem$1$20) === ">>") || ($as_T(elem$1$20) === "[]>>"))) {
-                var ets_new$9 = new $c_Lmain_scala_EnabledTaskSet().init___();
-                ets_new$9.tasks$1.$$plus$eq__O__scm_ListBuffer(child$9);
-                var desactivationTask$9 = child$9.findDesactivationTaskRightUp__Lmain_scala_CttNode();
-                if ((desactivationTask$9 !== null)) {
-                  ets_new$9.tasks$1.$$plus$eq__O__scm_ListBuffer(desactivationTask$9)
-                };
-                $as_Lmain_scala_EnabledTaskSets(elem$1).sets$1.$$plus$eq__O__scm_ListBuffer(ets_new$9)
-              };
-              these$9 = $as_sci_List(these$9.tail__O())
-            };
-            elem$1$19 = (((-1) + elem$1$19) | 0)
-          };
-          elem$1$19 = ((1 + elem$1$19) | 0)
-        } else {
-          break
-        }
-      };
-      if ((i$9 === scala$collection$immutable$Range$$lastElement$4$9)) {
-        break
-      };
-      i$9 = ((1 + i$9) | 0)
-    }
-  };
-  var this$192 = $as_Lmain_scala_EnabledTaskSets(elem$1).sets$1;
-  var etss_len$10 = this$192.len$6;
-  var isEmpty$4$10 = (etss_len$10 <= 0);
-  var scala$collection$immutable$Range$$lastElement$4$10 = (((-1) + etss_len$10) | 0);
-  if ((!isEmpty$4$10)) {
-    var i$10 = 0;
-    while (true) {
-      var v1$10 = i$10;
-      var ets$11 = $as_Lmain_scala_EnabledTaskSet($as_Lmain_scala_EnabledTaskSets(elem$1).sets$1.apply__I__O(v1$10));
-      var this$197 = $m_s_Console$();
-      var this$198 = $as_Ljava_io_PrintStream(this$197.outVar$2.v$1);
-      this$198.java$lang$JSConsoleBasedPrintStream$$printString__T__V("Enabled task set\n");
-      var elem$1$21 = 0;
-      elem$1$21 = 0;
-      while (true) {
-        var jsx$11 = elem$1$21;
-        var this$200 = ets$11.tasks$1;
-        if ((jsx$11 < this$200.len$6)) {
-          var task$10 = $as_Lmain_scala_CttNode(ets$11.tasks$1.apply__I__O(elem$1$21));
-          var x$10 = ((("  task: " + task$10) + "  j: ") + elem$1$21);
-          var this$202 = $m_s_Console$();
-          var this$203 = $as_Ljava_io_PrintStream(this$202.outVar$2.v$1);
-          this$203.java$lang$JSConsoleBasedPrintStream$$printString__T__V((x$10 + "\n"));
-          var this$204 = task$10.children$1;
-          if ((this$204.len$6 > 0)) {
-            ets$11.tasks$1.remove__I__O(elem$1$21);
-            var elem$1$22 = null;
-            elem$1$22 = "";
-            var this$206 = task$10.children$1;
-            var this$207 = this$206.scala$collection$mutable$ListBuffer$$start$6;
-            var these$10 = this$207;
-            while ((!these$10.isEmpty__Z())) {
-              var arg1$10 = these$10.head__O();
-              var child$10 = $as_Lmain_scala_CttNode(arg1$10);
-              if ((child$10.Operator__Lmain_scala_CttOperator() !== null)) {
-                elem$1$22 = child$10.Operator__Lmain_scala_CttOperator().name$1
-              } else if ((((((((($as_T(elem$1$22) === "") || ($as_T(elem$1$22) === "[]")) || ($as_T(elem$1$22) === "|=|")) || ($as_T(elem$1$22) === "||")) || ($as_T(elem$1$22) === "|||")) || ($as_T(elem$1$22) === "|[]|")) || ($as_T(elem$1$22) === "[>")) || ($as_T(elem$1$22) === "|>"))) {
-                var this$210 = ets$11.tasks$1;
-                var n$10 = elem$1$21;
-                var array$10 = [child$10];
-                var elems$10 = new $c_sjs_js_WrappedArray().init___sjs_js_Array(array$10);
-                this$210.insertAll__I__sc_Traversable__V(n$10, elems$10);
-                elem$1$21 = ((1 + elem$1$21) | 0)
-              } else if ((($as_T(elem$1$22) === ">>") || ($as_T(elem$1$22) === "[]>>"))) {
-                var ets_new$10 = new $c_Lmain_scala_EnabledTaskSet().init___();
-                ets_new$10.tasks$1.$$plus$eq__O__scm_ListBuffer(child$10);
-                var desactivationTask$10 = child$10.findDesactivationTaskRightUp__Lmain_scala_CttNode();
-                if ((desactivationTask$10 !== null)) {
-                  ets_new$10.tasks$1.$$plus$eq__O__scm_ListBuffer(desactivationTask$10)
-                };
-                $as_Lmain_scala_EnabledTaskSets(elem$1).sets$1.$$plus$eq__O__scm_ListBuffer(ets_new$10)
-              };
-              these$10 = $as_sci_List(these$10.tail__O())
-            };
-            elem$1$21 = (((-1) + elem$1$21) | 0)
-          };
-          elem$1$21 = ((1 + elem$1$21) | 0)
-        } else {
-          break
-        }
-      };
-      if ((i$10 === scala$collection$immutable$Range$$lastElement$4$10)) {
-        break
-      };
-      i$10 = ((1 + i$10) | 0)
-    }
-  };
-  var this$211 = $as_Lmain_scala_EnabledTaskSets(elem$1).sets$1;
-  var etss_len$11 = this$211.len$6;
-  var isEmpty$4$11 = (etss_len$11 <= 0);
-  var scala$collection$immutable$Range$$lastElement$4$11 = (((-1) + etss_len$11) | 0);
-  if ((!isEmpty$4$11)) {
-    var i$11 = 0;
-    while (true) {
-      var v1$11 = i$11;
-      var ets$12 = $as_Lmain_scala_EnabledTaskSet($as_Lmain_scala_EnabledTaskSets(elem$1).sets$1.apply__I__O(v1$11));
-      var this$216 = $m_s_Console$();
-      var this$217 = $as_Ljava_io_PrintStream(this$216.outVar$2.v$1);
-      this$217.java$lang$JSConsoleBasedPrintStream$$printString__T__V("Enabled task set\n");
-      var elem$1$23 = 0;
-      elem$1$23 = 0;
-      while (true) {
-        var jsx$12 = elem$1$23;
-        var this$219 = ets$12.tasks$1;
-        if ((jsx$12 < this$219.len$6)) {
-          var task$11 = $as_Lmain_scala_CttNode(ets$12.tasks$1.apply__I__O(elem$1$23));
-          var x$11 = ((("  task: " + task$11) + "  j: ") + elem$1$23);
-          var this$221 = $m_s_Console$();
-          var this$222 = $as_Ljava_io_PrintStream(this$221.outVar$2.v$1);
-          this$222.java$lang$JSConsoleBasedPrintStream$$printString__T__V((x$11 + "\n"));
-          var this$223 = task$11.children$1;
-          if ((this$223.len$6 > 0)) {
-            ets$12.tasks$1.remove__I__O(elem$1$23);
-            var elem$1$24 = null;
-            elem$1$24 = "";
-            var this$225 = task$11.children$1;
-            var this$226 = this$225.scala$collection$mutable$ListBuffer$$start$6;
-            var these$11 = this$226;
-            while ((!these$11.isEmpty__Z())) {
-              var arg1$11 = these$11.head__O();
-              var child$11 = $as_Lmain_scala_CttNode(arg1$11);
-              if ((child$11.Operator__Lmain_scala_CttOperator() !== null)) {
-                elem$1$24 = child$11.Operator__Lmain_scala_CttOperator().name$1
-              } else if ((((((((($as_T(elem$1$24) === "") || ($as_T(elem$1$24) === "[]")) || ($as_T(elem$1$24) === "|=|")) || ($as_T(elem$1$24) === "||")) || ($as_T(elem$1$24) === "|||")) || ($as_T(elem$1$24) === "|[]|")) || ($as_T(elem$1$24) === "[>")) || ($as_T(elem$1$24) === "|>"))) {
-                var this$229 = ets$12.tasks$1;
-                var n$11 = elem$1$23;
-                var array$11 = [child$11];
-                var elems$11 = new $c_sjs_js_WrappedArray().init___sjs_js_Array(array$11);
-                this$229.insertAll__I__sc_Traversable__V(n$11, elems$11);
-                elem$1$23 = ((1 + elem$1$23) | 0)
-              } else if ((($as_T(elem$1$24) === ">>") || ($as_T(elem$1$24) === "[]>>"))) {
-                var ets_new$11 = new $c_Lmain_scala_EnabledTaskSet().init___();
-                ets_new$11.tasks$1.$$plus$eq__O__scm_ListBuffer(child$11);
-                var desactivationTask$11 = child$11.findDesactivationTaskRightUp__Lmain_scala_CttNode();
-                if ((desactivationTask$11 !== null)) {
-                  ets_new$11.tasks$1.$$plus$eq__O__scm_ListBuffer(desactivationTask$11)
-                };
-                $as_Lmain_scala_EnabledTaskSets(elem$1).sets$1.$$plus$eq__O__scm_ListBuffer(ets_new$11)
-              };
-              these$11 = $as_sci_List(these$11.tail__O())
-            };
-            elem$1$23 = (((-1) + elem$1$23) | 0)
-          };
-          elem$1$23 = ((1 + elem$1$23) | 0)
-        } else {
-          break
-        }
-      };
-      if ((i$11 === scala$collection$immutable$Range$$lastElement$4$11)) {
-        break
-      };
-      i$11 = ((1 + i$11) | 0)
-    }
-  };
-  var this$230 = $as_Lmain_scala_EnabledTaskSets(elem$1).sets$1;
-  var etss_len$12 = this$230.len$6;
-  var isEmpty$4$12 = (etss_len$12 <= 0);
-  var scala$collection$immutable$Range$$lastElement$4$12 = (((-1) + etss_len$12) | 0);
-  if ((!isEmpty$4$12)) {
-    var i$12 = 0;
-    while (true) {
-      var v1$12 = i$12;
-      var ets$13 = $as_Lmain_scala_EnabledTaskSet($as_Lmain_scala_EnabledTaskSets(elem$1).sets$1.apply__I__O(v1$12));
-      var this$235 = $m_s_Console$();
-      var this$236 = $as_Ljava_io_PrintStream(this$235.outVar$2.v$1);
-      this$236.java$lang$JSConsoleBasedPrintStream$$printString__T__V("Enabled task set\n");
-      var elem$1$25 = 0;
-      elem$1$25 = 0;
-      while (true) {
-        var jsx$13 = elem$1$25;
-        var this$238 = ets$13.tasks$1;
-        if ((jsx$13 < this$238.len$6)) {
-          var task$12 = $as_Lmain_scala_CttNode(ets$13.tasks$1.apply__I__O(elem$1$25));
-          var x$12 = ((("  task: " + task$12) + "  j: ") + elem$1$25);
-          var this$240 = $m_s_Console$();
-          var this$241 = $as_Ljava_io_PrintStream(this$240.outVar$2.v$1);
-          this$241.java$lang$JSConsoleBasedPrintStream$$printString__T__V((x$12 + "\n"));
-          var this$242 = task$12.children$1;
-          if ((this$242.len$6 > 0)) {
-            ets$13.tasks$1.remove__I__O(elem$1$25);
-            var elem$1$26 = null;
-            elem$1$26 = "";
-            var this$244 = task$12.children$1;
-            var this$245 = this$244.scala$collection$mutable$ListBuffer$$start$6;
-            var these$12 = this$245;
-            while ((!these$12.isEmpty__Z())) {
-              var arg1$12 = these$12.head__O();
-              var child$12 = $as_Lmain_scala_CttNode(arg1$12);
-              if ((child$12.Operator__Lmain_scala_CttOperator() !== null)) {
-                elem$1$26 = child$12.Operator__Lmain_scala_CttOperator().name$1
-              } else if ((((((((($as_T(elem$1$26) === "") || ($as_T(elem$1$26) === "[]")) || ($as_T(elem$1$26) === "|=|")) || ($as_T(elem$1$26) === "||")) || ($as_T(elem$1$26) === "|||")) || ($as_T(elem$1$26) === "|[]|")) || ($as_T(elem$1$26) === "[>")) || ($as_T(elem$1$26) === "|>"))) {
-                var this$248 = ets$13.tasks$1;
-                var n$12 = elem$1$25;
-                var array$12 = [child$12];
-                var elems$12 = new $c_sjs_js_WrappedArray().init___sjs_js_Array(array$12);
-                this$248.insertAll__I__sc_Traversable__V(n$12, elems$12);
-                elem$1$25 = ((1 + elem$1$25) | 0)
-              } else if ((($as_T(elem$1$26) === ">>") || ($as_T(elem$1$26) === "[]>>"))) {
-                var ets_new$12 = new $c_Lmain_scala_EnabledTaskSet().init___();
-                ets_new$12.tasks$1.$$plus$eq__O__scm_ListBuffer(child$12);
-                var desactivationTask$12 = child$12.findDesactivationTaskRightUp__Lmain_scala_CttNode();
-                if ((desactivationTask$12 !== null)) {
-                  ets_new$12.tasks$1.$$plus$eq__O__scm_ListBuffer(desactivationTask$12)
-                };
-                $as_Lmain_scala_EnabledTaskSets(elem$1).sets$1.$$plus$eq__O__scm_ListBuffer(ets_new$12)
-              };
-              these$12 = $as_sci_List(these$12.tail__O())
-            };
-            elem$1$25 = (((-1) + elem$1$25) | 0)
-          };
-          elem$1$25 = ((1 + elem$1$25) | 0)
-        } else {
-          break
-        }
-      };
-      if ((i$12 === scala$collection$immutable$Range$$lastElement$4$12)) {
-        break
-      };
-      i$12 = ((1 + i$12) | 0)
-    }
-  };
-  var this$249 = $as_Lmain_scala_EnabledTaskSets(elem$1).sets$1;
-  var etss_len$13 = this$249.len$6;
-  var isEmpty$4$13 = (etss_len$13 <= 0);
-  var scala$collection$immutable$Range$$lastElement$4$13 = (((-1) + etss_len$13) | 0);
-  if ((!isEmpty$4$13)) {
-    var i$13 = 0;
-    while (true) {
-      var v1$13 = i$13;
-      var ets$14 = $as_Lmain_scala_EnabledTaskSet($as_Lmain_scala_EnabledTaskSets(elem$1).sets$1.apply__I__O(v1$13));
-      var this$254 = $m_s_Console$();
-      var this$255 = $as_Ljava_io_PrintStream(this$254.outVar$2.v$1);
-      this$255.java$lang$JSConsoleBasedPrintStream$$printString__T__V("Enabled task set\n");
-      var elem$1$27 = 0;
-      elem$1$27 = 0;
-      while (true) {
-        var jsx$14 = elem$1$27;
-        var this$257 = ets$14.tasks$1;
-        if ((jsx$14 < this$257.len$6)) {
-          var task$13 = $as_Lmain_scala_CttNode(ets$14.tasks$1.apply__I__O(elem$1$27));
-          var x$13 = ((("  task: " + task$13) + "  j: ") + elem$1$27);
-          var this$259 = $m_s_Console$();
-          var this$260 = $as_Ljava_io_PrintStream(this$259.outVar$2.v$1);
-          this$260.java$lang$JSConsoleBasedPrintStream$$printString__T__V((x$13 + "\n"));
-          var this$261 = task$13.children$1;
-          if ((this$261.len$6 > 0)) {
-            ets$14.tasks$1.remove__I__O(elem$1$27);
-            var elem$1$28 = null;
-            elem$1$28 = "";
-            var this$263 = task$13.children$1;
-            var this$264 = this$263.scala$collection$mutable$ListBuffer$$start$6;
-            var these$13 = this$264;
-            while ((!these$13.isEmpty__Z())) {
-              var arg1$13 = these$13.head__O();
-              var child$13 = $as_Lmain_scala_CttNode(arg1$13);
-              if ((child$13.Operator__Lmain_scala_CttOperator() !== null)) {
-                elem$1$28 = child$13.Operator__Lmain_scala_CttOperator().name$1
-              } else if ((((((((($as_T(elem$1$28) === "") || ($as_T(elem$1$28) === "[]")) || ($as_T(elem$1$28) === "|=|")) || ($as_T(elem$1$28) === "||")) || ($as_T(elem$1$28) === "|||")) || ($as_T(elem$1$28) === "|[]|")) || ($as_T(elem$1$28) === "[>")) || ($as_T(elem$1$28) === "|>"))) {
-                var this$267 = ets$14.tasks$1;
-                var n$13 = elem$1$27;
-                var array$13 = [child$13];
-                var elems$13 = new $c_sjs_js_WrappedArray().init___sjs_js_Array(array$13);
-                this$267.insertAll__I__sc_Traversable__V(n$13, elems$13);
-                elem$1$27 = ((1 + elem$1$27) | 0)
-              } else if ((($as_T(elem$1$28) === ">>") || ($as_T(elem$1$28) === "[]>>"))) {
-                var ets_new$13 = new $c_Lmain_scala_EnabledTaskSet().init___();
-                ets_new$13.tasks$1.$$plus$eq__O__scm_ListBuffer(child$13);
-                var desactivationTask$13 = child$13.findDesactivationTaskRightUp__Lmain_scala_CttNode();
-                if ((desactivationTask$13 !== null)) {
-                  ets_new$13.tasks$1.$$plus$eq__O__scm_ListBuffer(desactivationTask$13)
-                };
-                $as_Lmain_scala_EnabledTaskSets(elem$1).sets$1.$$plus$eq__O__scm_ListBuffer(ets_new$13)
-              };
-              these$13 = $as_sci_List(these$13.tail__O())
-            };
-            elem$1$27 = (((-1) + elem$1$27) | 0)
-          };
-          elem$1$27 = ((1 + elem$1$27) | 0)
-        } else {
-          break
-        }
-      };
-      if ((i$13 === scala$collection$immutable$Range$$lastElement$4$13)) {
-        break
-      };
-      i$13 = ((1 + i$13) | 0)
-    }
-  };
-  var this$268 = $as_Lmain_scala_EnabledTaskSets(elem$1).sets$1;
-  var etss_len$14 = this$268.len$6;
-  var isEmpty$4$14 = (etss_len$14 <= 0);
-  var scala$collection$immutable$Range$$lastElement$4$14 = (((-1) + etss_len$14) | 0);
-  if ((!isEmpty$4$14)) {
-    var i$14 = 0;
-    while (true) {
-      var v1$14 = i$14;
-      var ets$15 = $as_Lmain_scala_EnabledTaskSet($as_Lmain_scala_EnabledTaskSets(elem$1).sets$1.apply__I__O(v1$14));
-      var this$273 = $m_s_Console$();
-      var this$274 = $as_Ljava_io_PrintStream(this$273.outVar$2.v$1);
-      this$274.java$lang$JSConsoleBasedPrintStream$$printString__T__V("Enabled task set\n");
-      var elem$1$29 = 0;
-      elem$1$29 = 0;
-      while (true) {
-        var jsx$15 = elem$1$29;
-        var this$276 = ets$15.tasks$1;
-        if ((jsx$15 < this$276.len$6)) {
-          var task$14 = $as_Lmain_scala_CttNode(ets$15.tasks$1.apply__I__O(elem$1$29));
-          var x$14 = ((("  task: " + task$14) + "  j: ") + elem$1$29);
-          var this$278 = $m_s_Console$();
-          var this$279 = $as_Ljava_io_PrintStream(this$278.outVar$2.v$1);
-          this$279.java$lang$JSConsoleBasedPrintStream$$printString__T__V((x$14 + "\n"));
-          var this$280 = task$14.children$1;
-          if ((this$280.len$6 > 0)) {
-            ets$15.tasks$1.remove__I__O(elem$1$29);
-            var elem$1$30 = null;
-            elem$1$30 = "";
-            var this$282 = task$14.children$1;
-            var this$283 = this$282.scala$collection$mutable$ListBuffer$$start$6;
-            var these$14 = this$283;
-            while ((!these$14.isEmpty__Z())) {
-              var arg1$14 = these$14.head__O();
-              var child$14 = $as_Lmain_scala_CttNode(arg1$14);
-              if ((child$14.Operator__Lmain_scala_CttOperator() !== null)) {
-                elem$1$30 = child$14.Operator__Lmain_scala_CttOperator().name$1
-              } else if ((((((((($as_T(elem$1$30) === "") || ($as_T(elem$1$30) === "[]")) || ($as_T(elem$1$30) === "|=|")) || ($as_T(elem$1$30) === "||")) || ($as_T(elem$1$30) === "|||")) || ($as_T(elem$1$30) === "|[]|")) || ($as_T(elem$1$30) === "[>")) || ($as_T(elem$1$30) === "|>"))) {
-                var this$286 = ets$15.tasks$1;
-                var n$14 = elem$1$29;
-                var array$14 = [child$14];
-                var elems$14 = new $c_sjs_js_WrappedArray().init___sjs_js_Array(array$14);
-                this$286.insertAll__I__sc_Traversable__V(n$14, elems$14);
-                elem$1$29 = ((1 + elem$1$29) | 0)
-              } else if ((($as_T(elem$1$30) === ">>") || ($as_T(elem$1$30) === "[]>>"))) {
-                var ets_new$14 = new $c_Lmain_scala_EnabledTaskSet().init___();
-                ets_new$14.tasks$1.$$plus$eq__O__scm_ListBuffer(child$14);
-                var desactivationTask$14 = child$14.findDesactivationTaskRightUp__Lmain_scala_CttNode();
-                if ((desactivationTask$14 !== null)) {
-                  ets_new$14.tasks$1.$$plus$eq__O__scm_ListBuffer(desactivationTask$14)
-                };
-                $as_Lmain_scala_EnabledTaskSets(elem$1).sets$1.$$plus$eq__O__scm_ListBuffer(ets_new$14)
-              };
-              these$14 = $as_sci_List(these$14.tail__O())
-            };
-            elem$1$29 = (((-1) + elem$1$29) | 0)
-          };
-          elem$1$29 = ((1 + elem$1$29) | 0)
-        } else {
-          break
-        }
-      };
-      if ((i$14 === scala$collection$immutable$Range$$lastElement$4$14)) {
-        break
-      };
-      i$14 = ((1 + i$14) | 0)
+        };
+        i = ((1 + i) | 0)
+      }
+    };
+    if (elem$1$1) {
+      /*<skip>*/
+    } else {
+      break
     }
   };
   return $as_Lmain_scala_EnabledTaskSets(elem$1)
@@ -5595,7 +4722,7 @@ $c_Lmain_scala_StaticUtil$.prototype.linear$undparse$undctt__T__Lmain_scala_CttN
     var beginIndex = currentCharIndex;
     var endIndex = nextCharIndex;
     var line = $as_T(thiz$1.substring(beginIndex, endIndex));
-    if ((!this.isEmpty__T__Z(line))) {
+    if (((!this.isEmpty__T__Z(line)) && (!(($uI(line.length) >= 0) && ($as_T(line.substring(0, $uI("#".length))) === "#"))))) {
       var leading_tabs = this.count$undleading$undtabs__T__I(line);
       var node = new $c_Lmain_scala_CttNode().init___();
       node.name$1 = $as_T(line.substring(leading_tabs));
@@ -5605,7 +4732,7 @@ $c_Lmain_scala_StaticUtil$.prototype.linear$undparse$undctt__T__Lmain_scala_CttN
         if ((leading_tabs < indentLevel)) {
           this.shrink$undstack__scm_Stack__I__V(stack, ((1 + leading_tabs) | 0))
         } else {
-          throw $m_sjsr_package$().unwrapJavaScriptException__jl_Throwable__O(new $c_jl_Exception().init___T("Something went wrong"))
+          throw $m_sjsr_package$().unwrapJavaScriptException__jl_Throwable__O(new $c_jl_Exception().init___T("Something went wrong with the indentation."))
         }
       };
       indentLevel = leading_tabs;
