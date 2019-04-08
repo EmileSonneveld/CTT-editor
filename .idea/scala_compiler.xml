@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ScalaCompilerConfiguration">
+    <profile name="sbt 1" modules="ctt-editor_9997" />
+    <profile name="sbt 2" modules="CTT-editor">
+      <option name="featureWarnings" value="true" />
+      <plugins>
+        <plugin path="C:\Users\emill\.ivy2\cache\org.scala-js\scalajs-compiler_2.12.6\jars\scalajs-compiler_2.12.6-0.6.26.jar" />
+      </plugins>
+    </profile>
+  </component>
+</project>
