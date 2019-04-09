@@ -22,6 +22,92 @@ object CrudServer extends App {
   if (Desktop.isDesktopSupported) Desktop.getDesktop.browse(new URI("http://localhost:6773/www/"))
 
   // Inspired from: https://github.com/ianopolous/simple-http-server/blob/master/src/http/StaticHandler.java
+  object StaticHandler {
+
+    def getListOfFiles(dir: String): List[File] = {
+      val d = new File(dir)
+      if (d.exists && d.isDirectory) {
+        d.listFiles.filter(_.isFile).toList
+      } else {
+        List[File]()
+      }
+    }
+
+    def getPostParms(requestBody: InputStream): util.HashMap[String, util.ArrayList[String]] = {
+
+      //val reqHeaders = httpExchange.getRequestHeaders
+      //val contentType = reqHeaders.getFirst("Content-Type")
+      var encoding = "ISO-8859-1"
+      //if (contentType != null) {
+      //  val parms = ValueParser.parse(contentType)
+      //  if (parms.containsKey("charset")) encoding = parms.get("charset")
+      //}
+
+
+      // read the query string from the request body
+      var qry: String = null
+      val in = requestBody
+      try {
+        val out = new ByteArrayOutputStream
+        val buf = new Array[Byte](4096)
+        var n = in.read(buf)
+        while ( {
+          n > 0
+        }) {
+          out.write(buf, 0, n)
+
+          n = in.read(buf)
+        }
+        qry = new String(out.toByteArray, encoding)
+      } finally in.close()
+      // parse the query
+      val parms = new util.HashMap[String, util.ArrayList[String]]()
+      val defs = qry.split("[&]")
+      for (defi <- defs) {
+        val ix = defi.indexOf('=')
+        var name: String = null
+        var value: String = null
+        if (ix < 0) {
+          name = URLDecoder.decode(defi, encoding)
+          value = ""
+        }
+        else {
+          name = URLDecoder.decode(defi.substring(0, ix), encoding)
+          value = URLDecoder.decode(defi.substring(ix + 1), encoding)
+        }
+        var list = parms.get(name)
+        if (list == null) {
+          list = new util.ArrayList[String]
+          parms.put(name, list)
+        }
+        list.add(value)
+
+      }
+      return parms
+    }
+
+
+    @throws[IOException]
+    private def readResource(in: InputStream, gzip: Boolean) = {
+      val bout = new ByteArrayOutputStream
+      val gout = if (gzip) new GZIPOutputStream(bout)
+      else new DataOutputStream(bout)
+      val tmp = new Array[Byte](4096)
+      var r = 0
+      r = in.read(tmp)
+      while ( {
+        r >= 0
+      }) {
+        gout.write(tmp, 0, r)
+        r = in.read(tmp)
+      }
+      gout.flush()
+      gout.close()
+      in.close()
+      bout.toByteArray
+    }
+  }
+
   class StaticHandler extends HttpHandler {
 
     private class Asset(val data: Array[Byte]) {
@@ -47,12 +133,18 @@ object CrudServer extends App {
 
           // determine encoding// determine encoding
 
-          //val parms = getPostParms(httpExchange.getRequestBody)
+          //val parms = StaticHandler.getPostParms(httpExchange.getRequestBody)
           //val fileContent = parms.get("file_content").get(0)
           val fileContent = URLDecoder.decode((httpExchange.getRequestHeaders().get("file_content")).get(0), "utf-8")
 
           val f = new File(pathToRoot + path)
-          new PrintWriter(f) {try {write(fileContent)} finally {close}}
+          new PrintWriter(f) {
+            try {
+              write(fileContent)
+            } finally {
+              close
+            }
+          }
           res = new Asset("File written".getBytes())
           status = 200
 
@@ -62,7 +154,7 @@ object CrudServer extends App {
             httpExchange.getResponseHeaders.set("Content-Type", "application/json")
             val sb = new StringBuilder
             sb.append("[\n")
-            sb.append(getListOfFiles(pathToRoot + path)
+            sb.append(StaticHandler.getListOfFiles(pathToRoot + path)
               .map(f => s"""{\n\t"name":"${f.getName}"\n}""")
               .mkString(",\n"))
             sb.append("]\n")
@@ -72,7 +164,7 @@ object CrudServer extends App {
             val in = if (fromFile) new FileInputStream(pathToRoot + path)
             else ClassLoader.getSystemClassLoader.getResourceAsStream(pathToRoot + path)
             res = if (caching) data.get(path)
-            else new Asset(readResource(in, gzip))
+            else new Asset(StaticHandler.readResource(in, gzip))
             if (gzip) httpExchange.getResponseHeaders.set("Content-Encoding", "gzip")
             if (path.endsWith(".js")) httpExchange.getResponseHeaders.set("Content-Type", "text/javascript")
             else if (path.endsWith(".html")) httpExchange.getResponseHeaders.set("Content-Type", "text/html")
@@ -105,71 +197,10 @@ object CrudServer extends App {
       httpExchange.getResponseBody.close()
     }
 
-    def getPostParms(requestBody: InputStream): util.HashMap[String, util.ArrayList[String]] = {
-
-      //val reqHeaders = httpExchange.getRequestHeaders
-      //val contentType = reqHeaders.getFirst("Content-Type")
-      var encoding = "ISO-8859-1"
-      //if (contentType != null) {
-      //  val parms = ValueParser.parse(contentType)
-      //  if (parms.containsKey("charset")) encoding = parms.get("charset")
-      //}
-
-
-      // read the query string from the request body
-      var qry: String = null
-      val in = requestBody
-      try {
-        val out = new ByteArrayOutputStream
-        val buf = new Array[Byte](4096)
-        var n = in.read(buf)
-        while ( {
-          n > 0
-        }) {
-          out.write(buf, 0, n)
-
-          n = in.read(buf)
-        }
-        qry = new String(out.toByteArray, encoding)
-      } finally in.close
-      // parse the query
-      val parms = new util.HashMap[String, util.ArrayList[String]]()
-      val defs = qry.split("[&]")
-      for (defi <- defs) {
-        val ix = defi.indexOf('=')
-        var name: String = null
-        var value: String = null
-        if (ix < 0) {
-          name = URLDecoder.decode(defi, encoding)
-          value = ""
-        }
-        else {
-          name = URLDecoder.decode(defi.substring(0, ix), encoding)
-          value = URLDecoder.decode(defi.substring(ix + 1), encoding)
-        }
-        var list = parms.get(name)
-        if (list == null) {
-          list = new util.ArrayList[String]
-          parms.put(name, list)
-        }
-        list.add(value)
-
-      }
-      return parms
-    }
-
-    def getListOfFiles(dir: String): List[File] = {
-      val d = new File(dir)
-      if (d.exists && d.isDirectory) {
-        d.listFiles.filter(_.isFile).toList
-      } else {
-        List[File]()
-      }
-    }
 
     @throws[IOException]
     private def processFile(path: String, f: File, gzip: Boolean): Unit = {
-      if (!f.isDirectory) data.put(path + f.getName, new Asset(readResource(new FileInputStream(f), gzip)))
+      if (!f.isDirectory) data.put(path + f.getName, new Asset(StaticHandler.readResource(new FileInputStream(f), gzip)))
       if (f.isDirectory) {
         for (sub <- f.listFiles) {
           processFile(path + f.getName + "/", sub, gzip)
@@ -177,25 +208,6 @@ object CrudServer extends App {
       }
     }
 
-    @throws[IOException]
-    private def readResource(in: InputStream, gzip: Boolean) = {
-      val bout = new ByteArrayOutputStream
-      val gout = if (gzip) new GZIPOutputStream(bout)
-      else new DataOutputStream(bout)
-      val tmp = new Array[Byte](4096)
-      var r = 0
-      r = in.read(tmp)
-      while ( {
-        r >= 0
-      }) {
-        gout.write(tmp, 0, r)
-        r = in.read(tmp)
-      }
-      gout.flush()
-      gout.close()
-      in.close()
-      bout.toByteArray
-    }
   }
 
 }
