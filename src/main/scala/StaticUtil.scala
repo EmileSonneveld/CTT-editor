@@ -278,7 +278,7 @@ object StaticUtil {
         }
         val icon = child.GetIconName()
         if (!isEmpty(icon)) {
-          sb.append("<line x1='" + (n.pos.x) + "' y1='" + (n.pos.y + 16) + "' x2='" + child.pos.x + "' y2='" + (child.pos.y - 16) + "' style='stroke-width: 1; stroke:#0a0a0a; fill-opacity:0.7;'></line>\n")
+          sb.append("<line x1='" + (n.pos.x) + "' y1='" + (n.pos.y + 16 + 15) + "' x2='" + child.pos.x + "' y2='" + (child.pos.y - 16) + "' style='stroke-width: 1; stroke:#0a0a0a; fill-opacity:0.7;'></line>\n")
         }
         render_recurse_lines(child)
         prevChild = child
@@ -335,7 +335,7 @@ object StaticUtil {
 
 
   def calculatePosition(node: CttNode, offset: Vector2D = new Vector2D(0, 17)): Unit = {
-    val sizePerLayer = 60
+    val sizePerLayer = 70
 
     node.pos.x = offset.x + node.width / 2
     node.pos.y = offset.y
