@@ -1,16 +1,12 @@
 import org.scalajs.core.tools.linker.ModuleInitializer
 
-name := "CTT-editor"
-
-version := "0.1"
-
-scalaVersion := "2.12.7"
+version := "0.3"
 
 
 enablePlugins(ScalaJSPlugin)
 
 name := "CTT-editor"
-scalaVersion := "2.12.6" // or any other Scala version >= 2.10.2
+scalaVersion := "2.12.8" // or any other Scala version >= 2.10.2
 
 // This is an application with a main method
 scalaJSUseMainModuleInitializer := true
