@@ -32,6 +32,7 @@ html, body {
 			</select>
             <div><input type="checkbox" id="ctt-normlize"></input>Draw normailzed CTT</div>
             <button id="ctt-svg-download" style="height: 25px;">Download svg</button>
+            <button id="ctt-png-download" style="height: 25px;">Download PNG</button>
 		</div>
         <div style="display:flex; flex-direction:column; min-width: 400px; margin:5px">
 		  <textarea id="ctt-texarea" style="height: 100%; tab-size: 2; background: antiquewhite; resize:none;">
@@ -90,6 +91,14 @@ example
     crossorigin="anonymous"></script>
 -->
 
+
+<!-- Required to convert named colors to RGB -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/canvg/1.4/rgbcolor.min.js"></script>
+<!-- Optional if you want blur -->
+<script src="https://cdn.jsdelivr.net/npm/stackblur-canvas@^1/dist/stackblur.min.js"></script>
+<!-- Main canvg code -->
+<script src="https://cdn.jsdelivr.net/npm/canvg/dist/browser/canvg.min.js"></script>
+
 <script type="text/javascript">
 var cttTexarea = document.getElementById("ctt-texarea")
 cttTexarea.focus();
@@ -107,6 +116,36 @@ for(var i=0;i<count;i++){
 	}
 }
 
+function downloadSvgAsImage(){
+    var svg = document.querySelector('svg');
+    var data = (new XMLSerializer()).serializeToString(svg);
+    // We can just create a canvas element inline so you don't even need one on the DOM. Cool!
+    var canvas = document.createElement('canvas');
+    canvg(canvas, data, {
+      renderCallback: function() {
+        canvas.toBlob(function(blob) {
+            download('ctt.png', blob);
+        });
+      }
+    });
+}
+
+// Initiate download of blob
+function download(
+  filename, // string
+  blob // Blob
+) {
+  if (window.navigator.msSaveOrOpenBlob) {
+    window.navigator.msSaveBlob(blob, filename);
+  } else {
+    const elem = window.document.createElement('a');
+    elem.href = window.URL.createObjectURL(blob);
+    elem.download = filename;
+    document.body.appendChild(elem);
+    elem.click();
+    document.body.removeChild(elem);
+  }
+}
 	</script>
 </body>
 </html>

@@ -3,6 +3,9 @@ CTT-editor
 
 A straightforward way to write Concurrent Task Trees in plain text, with a fast visualizer.
 
+To Compile:
+sbt fastOptJS
+
 Binary release is available on GitHub.
 
 How task icons are chosen: https://github.com/EmileSonneveld/CTT-editor/blob/7f2391744df4d7847f39485492f7d333b830e677/src/main/scala/CttNode.scala#L91-L101
